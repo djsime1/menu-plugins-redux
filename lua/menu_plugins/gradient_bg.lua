@@ -6,6 +6,8 @@ local MANIFEST = {
     version = "1.0"
 }
 
+menup(MANIFEST)
+
 local grad = Material("gui/gradient", "nocull smooth")
 local r1, r2, r3, r4 = math.random(0, 359), math.random(0, 359), math.random(0, 359), math.random(0, 359)
 local fade = 1
@@ -37,5 +39,3 @@ function DrawBackground()
     surface.DrawTexturedRectRotated(w / 2, h / 2, h + 2, w + 2, 270)
     surface.SetAlphaMultiplier(1)
 end
-
-return MANIFEST
