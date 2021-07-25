@@ -16,8 +16,8 @@ function PANEL:Init()
     tabs:SetFadeTime(0)
     self.tabs = tabs
 
-    local plist = self:Add("DScrollPanel")
-    tabs:AddSheet("Installed plugins", plist, "icon16/bricks.png")
+    local plist = self:Add("PluginsPanel")
+    tabs:AddSheet("Installed plugins", plist, "icon16/box.png")
     self.plist = plist
 
     local find = vgui.Create("DPanel")
@@ -69,10 +69,10 @@ function PANEL:Paint(w, h) end
 
 vgui.Register("PluginsWindow", PANEL, "DFrame")
 
-function TogglePuginsWindow()
+function ShowPluginsWindow()
     PluginsWindow = IsValid(PluginsWindow) and PluginsWindow or vgui.Create("PluginsWindow")
     PluginsWindow:Center()
     PluginsWindow:MakePopup()
 end
 
-concommand.Add("menu_plugins", TogglePuginsWindow)
+concommand.Add("menu_plugins", ShowPluginsWindow)

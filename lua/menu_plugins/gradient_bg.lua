@@ -12,6 +12,8 @@ local grad = Material("gui/gradient", "nocull smooth")
 local r1, r2, r3, r4 = math.random(0, 359), math.random(0, 359), math.random(0, 359), math.random(0, 359)
 local fade = 1
 
+OldDrawBackground = DrawBackground
+
 function DrawBackground()
     local w, h = ScrW(), ScrH()
     local t = SysTime()
@@ -38,4 +40,8 @@ function DrawBackground()
     surface.SetDrawColor(HSVToColor(t * 5 + r4, 1, .9))
     surface.DrawTexturedRectRotated(w / 2, h / 2, h + 2, w + 2, 270)
     surface.SetAlphaMultiplier(1)
+end
+
+return function()
+    DrawBackground = OldDrawBackground
 end

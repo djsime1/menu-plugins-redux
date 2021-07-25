@@ -35,7 +35,8 @@ MsgN()
 _G.menup = {}
 
 include("plugin_bootstrapper/markdown.lua")
-include("plugin_bootstrapper/wip_minigame.lua")
+include("plugin_bootstrapper/wip_panel.lua")
+include("plugin_bootstrapper/plugins_panel.lua")
 include("plugin_bootstrapper/plugins_window.lua")
 include("plugin_bootstrapper/menu_button.lua")
 include("plugin_bootstrapper/menu_dev.lua")

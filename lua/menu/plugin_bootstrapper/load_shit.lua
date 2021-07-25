@@ -7,7 +7,8 @@ local manifest_default = {
     author = "Unknown",
     description = "Legacy addon.",
     version = "Legacy",
-    config = {}
+    config = {},
+    undo = function() end
 }
 
 function meta:__call() end
@@ -25,7 +26,7 @@ for _, v in ipairs(files) do
     local name = string.StripExtension(v)
     local script = file.Read("lua/menu_plugins/" .. v, "GAME")
     local trial = CompileString(script, v, false)
-    if isstring(trial) then print("Error loading " .. v .. ":\n" .. trial) continue end
+    if isstring(trial) then ErrorNoHalt("Error loading file " .. v .. ":\n" .. trial) continue end
     setfenv(trial, env)
     pcall(trial)
     setfenv(trial, _G)
@@ -47,7 +48,14 @@ for _, v in ipairs(files) do
     if shouldload[manifest.id] then
         print(manifest.id .. " (" .. v .. ") is ENABLED.")
         manifest.enabled = true
-        pcall(trial)
+        local success, result = pcall(trial)
+        if not success then
+            ErrorNoHalt("Error loading " .. manifest.id .. ":\n" .. result)
+        elseif isfunction(result) then
+            manifest.undo = result
+        else
+            manifest.undo = function() end
+        end
     else
         print(manifest.id .. " (" .. v .. ") is disabled.")
         manifest.enabled = false

@@ -16,4 +16,4 @@ local MANIFEST = {
     config = CONFIG
 }
 
---menup(MANIFEST)
+menup(MANIFEST)
