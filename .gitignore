@@ -2,6 +2,7 @@
 !.gitignore
 !README.md
 !LICENSE
+!VERSION
 !/lua
 !/lua/menu_plugins
 !/lua/menu_plugins/**

@@ -72,6 +72,7 @@ vgui.Register("PluginsWindow", PANEL, "DFrame")
 function ShowPluginsWindow()
     PluginsWindow = IsValid(PluginsWindow) and PluginsWindow or vgui.Create("PluginsWindow")
     PluginsWindow:Center()
+    PluginsWindow:SetZPos(9001)
     PluginsWindow:MakePopup()
 end
 

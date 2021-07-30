@@ -27,11 +27,11 @@ local function process()
     sql.Begin()
 
     for k, v in pairs(writeq) do
-        sql.Query("INSERT OR REPLACE INTO menup_redux (key, value) VALUES ( " .. SQLStr( k ) .. ", " .. SQLStr( v ) .. " )")
+        sql.Query("INSERT OR REPLACE INTO menup_redux (key, value) VALUES ( " .. SQLStr(k) .. ", " .. SQLStr(v) .. " )")
     end
 
     for k, _ in pairs(delq) do
-        sql.Query("DELETE FROM cookies WHERE key = " .. SQLStr( k ))
+        sql.Query("DELETE FROM menup_redux WHERE key = " .. SQLStr(k))
     end
 
     sql.Commit()
@@ -42,25 +42,29 @@ end
 
 menup.config = {}
 menup.config.set = function(id, key, value)
-    local data = util.JSONToTable(dbget("data_" .. id, '{"data": "{}", "store": ""}'))
+    local data = util.JSONToTable(dbget("data_" .. id, '{"config": "{}", "store": ""}'))
+    if isstring(data.config) then data.config = util.JSONToTable(data.config) end
     data.config[key] = value
     dbset("data_" .. id, util.TableToJSON(data, false))
 end
 
 menup.config.get = function(id, key, value)
-    local data = util.JSONToTable(dbget("data_" .. id, '{"data": "{}", "store": ""}'))
-    return (key ~= nil and data.config.key or data.config) or value
+    local data = util.JSONToTable(dbget("data_" .. id, '{"config": "{}", "store": ""}'))
+    if isstring(data.config) then data.config = util.JSONToTable(data.config) end
+    if key == nil then return data.config
+    elseif data.config[key] == nil then return value
+    else return data.config[key] end
 end
 
 menup.store = {}
 menup.store.set = function(id, str)
-    local data = util.JSONToTable(dbget("data_" .. id, '{"data": "{}", "store": ""}'))
+    local data = util.JSONToTable(dbget("data_" .. id, '{"config": "{}", "store": ""}'))
     data.store = str
     dbset("data_" .. id, util.TableToJSON(data, false))
 end
 
 menup.store.get = function(id, default)
-    local data = util.JSONToTable(dbget("data_" .. id, '{"data": "{}", "store": ""}'))
+    local data = util.JSONToTable(dbget("data_" .. id, '{"config": "{}", "store": ""}'))
     return data.store or default
 end
 
@@ -80,4 +84,4 @@ menup.db.get = dbget
 menup.db.set = dbset
 menup.db.del = dbdel
 
-timer.Create("menup_db", .5, 0, process)
+timer.Create("menup_db", 1, 0, process)

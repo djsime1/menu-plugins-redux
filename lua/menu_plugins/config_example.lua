@@ -1,10 +1,10 @@
 local CONFIG = {
-    {"Example bool", "bool", true, "Example description"},
-    {"Example int", "int", 10},
-    {"Example float", "float", 420.69, "nice"},
-    {"Example range", "range", {0, 100}},
-    {"Example string", "string", "Bazinga!"},
-    {"Example select", "select", {"Apple", "pear", "banana"}}
+    bool = {"Example bool", "bool", true, "Example description"},
+    int = {"Example int", "int", 10},
+    float = {"Example float", "float", 420.69, "nice"},
+    range = {"Example range", "range", {0, 100, 50}},
+    str = {"Example string", "string", "Bazinga!"},
+    sel = {"Example select", "select", {"Apple", "pear", "banana"}}
 }
 
 local MANIFEST = {

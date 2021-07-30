@@ -1,5 +1,46 @@
 local InfoPanel = table.Copy(vgui.GetControlTable("DPanel"))
 
+local cfpnls = {
+    bool = function(id, key, data)
+        local val = menup.config.get(id, key, isbool(data[3]) and data[3] or false)
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local cb = root:Add("DCheckBox")
+        if isstring(data[4]) then root:SetTooltip(data[4]) end
+        cb:Dock(RIGHT)
+        cb:SetWide(15)
+        cb:SetChecked(val)
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+        cb.OnChange = function(pnl, newval)
+            menup.config.set(id, key, newval)
+        end
+        return root
+    end,
+    int = function(id, key, data)
+        local val = menup.config.get(id, key, isnumber(data[3]) and data[3] or 0)
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local wang = root:Add("DNumberWang")
+        if isstring(data[4]) then root:SetTooltip(data[4]) end
+        wang:Dock(RIGHT)
+        wang:SetDecimals(0)
+        wang:SetMin(-math.huge)
+        wang:SetMax(math.huge)
+        wang:SetValue(val)
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+        wang.OnValueChanged = function(pnl, newval)
+            newval = math.Round(newval)
+            wang:SetText(tostring(newval))
+            menup.config.set(id, key, newval)
+        end
+        return root
+    end,
+}
+
 function InfoPanel:Init()
     self:SetTall(512)
     self:SetPaintBackground(false)
@@ -10,22 +51,30 @@ function InfoPanel:Init()
     local toggle = controls:Add("DButton")
     local alt = controls:Add("DButton")
     local md = self:Add("MarkdownPanel")
+    local cp = self:Add("DScrollPanel")
     md:SetPos(0, 32)
     md:SetTall(512)
+    cp:SetPos(self:GetWide(), 32)
+    cp:SetTall(512)
     self.controls = controls
     self.toggle = toggle
     self.alt = alt
     self.md = md
+    self.cp = cp
+    self.scroll = 1
 end
 
 function InfoPanel:Think()
     local w = self.controls:GetWide()
     local h = self:GetParent():GetParent():GetParent():GetTall() - 56 -- info collapse list sheet frame
+    local s = self.scroll
     self.toggle:SetWide(w / 2)
     self.alt:SetWide(w / 2)
-    self.md:SetWide(w)
-    self.md:SetTall(h)
+    self.md:SetSize(w, h)
+    self.cp:SetSize(w, h)
     self.alt:SetPos(w / 2, 0)
+    self.md:SetPos(-w * s, 32)
+    self.cp:SetPos((1 - s) * w, 32)
 end
 
 function InfoPanel:SetEnabled(state)
@@ -48,6 +97,22 @@ function InfoPanel:SetEnabled(state)
     self:Load(manifest)
 end
 
+function InfoPanel:BuildConfig(manifest)
+    self.cp:Clear()
+    print("building config for " .. manifest.id)
+    for k, v in pairs(manifest.config) do -- name type param desc
+        if isfunction(cfpnls[v[2]]) then
+            local pnl = cfpnls[v[2]](manifest.id, k, v)
+            self.cp:AddItem(pnl)
+            pnl:Dock(TOP)
+            pnl:DockPadding(4, 4, 4, 4)
+            pnl:DockMargin(0, 2, 0, 2)
+        else
+            print(manifest.id .. " has unknown config type \"" .. v[2] .. "\" for key \"" .. k .. "\"!")
+        end
+    end
+end
+
 function InfoPanel:Load(manifest)
     self.manifest = manifest
     self.md:SetMarkdown(string.format([[
@@ -59,6 +124,7 @@ function InfoPanel:Load(manifest)
 *ID* : `%s`  
 *File* : `%s`  
 ]], manifest.name, manifest.description, manifest.author, manifest.version, manifest.id, manifest.file))
+    if manifest.enabled and not table.IsEmpty(manifest.config) then self:BuildConfig(manifest) end
     if manifest.enabled then
         self.toggle:SetText("Disable")
         self.toggle:SetIcon("icon16/delete.png")
