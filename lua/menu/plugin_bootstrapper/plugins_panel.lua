@@ -281,7 +281,7 @@ function PANEL:Init()
     if !table.IsEmpty(legacy) then
         lcollapse = self:Add("Legacy plugins")
         lcollapse:SetExpanded(false)
-        function lcollapse.OnToggle(me, state)
+        lcollapse.OnToggle = function(me, state)
             if !state then return end
             for _, c in pairs(self:GetChildren()[1]:GetChildren()) do
                 if c ~= me then c:DoExpansion(false) end
@@ -291,6 +291,60 @@ function PANEL:Init()
 
         for _, v in ipairs(legacy) do
             local btn = lcollapse:Add(v.name)
+            btn:SetTall(22)
+            btn:SetEnabled(false)
+            btn:SetCursor("arrow")
+            btn.Paint = function(pnl, w, h)
+                draw.NoTexture()
+                surface.SetDrawColor(255, 255, 255)
+                surface.DrawRect(0, 0, w, h)
+                derma.SkinHook("Paint", "CategoryButton", pnl, w, h)
+            end
+            local alt = btn:Add("DButton")
+            alt:Dock(RIGHT)
+            alt:SetWide(22)
+            alt:SetText("")
+            alt:SetIcon("icon16/cog.png")
+            local toggle = btn:Add("DButton")
+            toggle:Dock(RIGHT)
+            toggle:SetWide(22)
+            toggle:SetText("")
+
+            alt.DoClick = function()
+                local dm = DermaMenu()
+                for i, x in pairs(v.config) do
+                    local cv = dm:AddOption(i, function()
+                        Derma_StringRequest("Change option", v.name .. "." .. i .. " = " .. tostring(x), tostring(x),
+                        function(txt) menup.config.set(v.id, txt) end) -- forgive me glualint
+                    end)
+                    if x == "true" or x == 1 or x == true then
+                        cv:SetIcon("icon16/tick.png")
+                    elseif x == "false" or x == 0 or x == false then
+                        cv:SetIcon("icon16/cross.png")
+                    else
+                        cv:SetIcon("icon16/pencil.png")
+                    end
+                end
+                dm:Open()
+            end
+
+            toggle.DoClick = function()
+                PrintTable(v)
+                local plugs = util.JSONToTable(menup.db.get("enabled", "{}"))
+                local state = !v.enabled
+                v.enabled = state
+                plugs[v.id] = state
+                menup.db.set("enabled", util.TableToJSON(plugs, false))
+                if state then
+                    local success, result = pcall(v.func)
+                    if not success then ErrorNoHalt("Error loading " .. v.id .. ":\n" .. result) end
+                end
+                alt:SetEnabled(v.enabled and not table.IsEmpty(v.config))
+                toggle:SetIcon(v.enabled and "icon16/lightbulb.png" or "icon16/lightbulb_off.png")
+            end
+
+            alt:SetEnabled(v.enabled and not table.IsEmpty(v.config))
+            toggle:SetIcon(v.enabled and "icon16/lightbulb.png" or "icon16/lightbulb_off.png")
         end
     end
 end

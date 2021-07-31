@@ -70,14 +70,23 @@ end
 
 menup.options = {} -- compatiblity layer for menup.config
 function menup.options.addOption(id, key, default)
-    if menup.config.get(id, key) ~= nil then return
-    else menup.config.set(id, key, default) end
+    id = "legacy." .. id
+    local val = menup.config.get(id, key, default)
+    menup.plugins[id].config[key] = val
+    menup.config.set(id, key, val)
+end
+
+function menup.options.getOption(id, key, default)
+    return menup.config.get("legacy." .. id, key, default)
+end
+
+function menup.options.setOption(id, key, value)
+    menup.config.set("legacy." .. id, key, value)
 end
 
 function menup.options.getTable() return {} end -- i'll do it later
 
-menup.options.getOption = menup.config.get
-menup.options.setOption = menup.config.set
+function menup.include(path) return include("menu_plugins/" .. path) end
 
 menup.db = {} -- please dont use this in a plugin
 menup.db.get = dbget

@@ -54,6 +54,9 @@ for _, v in ipairs(files) do
         manifest.func = trial
     end
 
+    menup.plugins[manifest.id] = table.Copy(manifest)
+    manifest = menup.plugins[manifest.id]
+
     if shouldload[manifest.id] then
         print(manifest.id .. " (" .. v .. ") is ENABLED.")
         manifest.enabled = true
@@ -76,7 +79,6 @@ for _, v in ipairs(files) do
         shouldload[manifest.id] = false
     end
 
-    menup.plugins[manifest.id] = table.Copy(manifest)
     manifest = nil
 end
 
