@@ -57,11 +57,11 @@ for _, v in ipairs(files) do
     if shouldload[manifest.id] then
         print(manifest.id .. " (" .. v .. ") is ENABLED.")
         manifest.enabled = true
-        if not table.IsEmpty(manifest.config) then
-            for ck, cv in pairs(manifest.config) do
-                menup.config.set(manifest.id, ck, cv[3] ~= nil and cv[3] or config_default[cv[2]])
-            end
-        end
+        -- if not table.IsEmpty(manifest.config) then
+        --     for ck, cv in pairs(manifest.config) do
+        --         menup.config.set(manifest.id, ck, cv[3] ~= nil and cv[3] or config_default[cv[2]])
+        --     end
+        -- end
         local success, result = pcall(trial)
         if not success then
             ErrorNoHalt("Error loading " .. manifest.id .. ":\n" .. result)

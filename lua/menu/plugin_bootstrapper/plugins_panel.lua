@@ -25,6 +25,7 @@ local cfpnls = {
         local wang = root:Add("DNumberWang")
         if isstring(data[4]) then root:SetTooltip(data[4]) end
         wang:Dock(RIGHT)
+        wang:SetWide(96)
         wang:SetDecimals(0)
         wang:SetMin(-math.huge)
         wang:SetMax(math.huge)
@@ -35,6 +36,87 @@ local cfpnls = {
         wang.OnValueChanged = function(pnl, newval)
             newval = math.Round(newval)
             wang:SetText(tostring(newval))
+            menup.config.set(id, key, newval)
+        end
+        return root
+    end,
+    float = function(id, key, data)
+        local val = menup.config.get(id, key, isnumber(data[3]) and data[3] or 0)
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local wang = root:Add("DNumberWang")
+        if isstring(data[4]) then root:SetTooltip(data[4]) end
+        wang:Dock(RIGHT)
+        wang:SetWide(96)
+        wang:SetMin(-math.huge)
+        wang:SetMax(math.huge)
+        wang:SetValue(val)
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+        wang.OnValueChanged = function(pnl, newval)
+            menup.config.set(id, key, newval)
+        end
+        return root
+    end,
+    range = function(id, key, data)
+        local min, max, default = data[3][1], data[3][2], data[3][3]
+        min = (min ~= nil and min or 0)
+        max = (max ~= nil and max or 100)
+        local val = menup.config.get(id, key, isnumber(default) and default or 0)
+        local root = vgui.Create("DPanel")
+        local slider = root:Add("DNumSlider")
+        if isstring(data[4]) then root:SetTooltip(data[4]) end
+        slider:Dock(FILL)
+        slider:SetDecimals(3)
+        slider:SetMinMax(min, max)
+        slider:SetValue(val)
+        slider:SetText(data[1])
+        slider:SetDark(true)
+        slider.OnValueChanged = function(pnl, newval)
+            menup.config.set(id, key, newval)
+        end
+        return root
+    end,
+    string = function(id, key, data)
+        local val = menup.config.get(id, key, isstring(data[3]) and data[3] or "")
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local tbox = root:Add("DTextEntry")
+        if isstring(data[4]) then root:SetTooltip(data[4]) end
+        root:SetTall(48)
+        tbox:Dock(BOTTOM)
+        tbox:SetText(val)
+        tbox:SetPlaceholderText(isstring(data[3]) and data[3])
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+        tbox.OnLoseFocus = function(pnl)
+            menup.config.set(id, key, pnl:GetText())
+        end
+        return root
+    end,
+    select = function(id, key, data)
+        local val = menup.config.get(id, key, isnumber(data[3][1]) and data[3][1] or 1)
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local combo = root:Add("DComboBox")
+        if isstring(data[4]) then root:SetTooltip(data[4]) end
+        root:SetTall(48)
+        combo:Dock(BOTTOM)
+        combo:SetSortItems(false)
+        for _, txt in ipairs(data[3]) do
+            if txt == "" then
+                combo:AddSpacer()
+            else
+                combo:AddChoice(txt)
+            end
+        end
+        combo:ChooseOptionID(val)
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+        combo.OnSelect = function(pnl, newval)
             menup.config.set(id, key, newval)
         end
         return root
@@ -61,12 +143,14 @@ function InfoPanel:Init()
     self.alt = alt
     self.md = md
     self.cp = cp
-    self.scroll = 1
+    self.scroll = 0
+    self.target = 0
 end
 
 function InfoPanel:Think()
     local w = self.controls:GetWide()
     local h = self:GetParent():GetParent():GetParent():GetTall() - 56 -- info collapse list sheet frame
+    self.scroll = Lerp(FrameTime() * 10, self.scroll, self.target)
     local s = self.scroll
     self.toggle:SetWide(w / 2)
     self.alt:SetWide(w / 2)
@@ -80,6 +164,7 @@ end
 function InfoPanel:SetEnabled(state)
     local plugs = util.JSONToTable(menup.db.get("enabled", "{}"))
     local manifest = self.manifest
+    self.target = 0
     manifest.enabled = state
     plugs[manifest.id] = state
     menup.db.set("enabled", util.TableToJSON(plugs, false))
@@ -99,8 +184,7 @@ end
 
 function InfoPanel:BuildConfig(manifest)
     self.cp:Clear()
-    print("building config for " .. manifest.id)
-    for k, v in pairs(manifest.config) do -- name type param desc
+    for k, v in SortedPairsByMemberValue(manifest.config, 1) do -- name type param desc
         if isfunction(cfpnls[v[2]]) then
             local pnl = cfpnls[v[2]](manifest.id, k, v)
             self.cp:AddItem(pnl)
@@ -124,7 +208,6 @@ function InfoPanel:Load(manifest)
 *ID* : `%s`  
 *File* : `%s`  
 ]], manifest.name, manifest.description, manifest.author, manifest.version, manifest.id, manifest.file))
-    if manifest.enabled and not table.IsEmpty(manifest.config) then self:BuildConfig(manifest) end
     if manifest.enabled then
         self.toggle:SetText("Disable")
         self.toggle:SetIcon("icon16/delete.png")
@@ -138,7 +221,23 @@ function InfoPanel:Load(manifest)
         self.alt:SetIcon("icon16/control_repeat.png")
         self.alt:SetEnabled(true)
     end
-    self.toggle.DoClick = function() self:SetEnabled(!manifest.enabled) end
+    self.toggle.DoClick = function(pnl) self:SetEnabled(!manifest.enabled) end
+    self.alt.DoClick = function(pnl)
+        if manifest.enabled and self.target == 0 then -- goto config
+            self:BuildConfig(manifest)
+            self.target = 1
+            self.alt:SetText("Description")
+            self.alt:SetIcon("icon16/text_dropcaps.png")
+        elseif manifest.enabled and self.target == 1 then -- goto description
+            self.target = 0
+            self.alt:SetText("Config")
+            self.alt:SetIcon("icon16/cog.png")
+        else -- reset
+            Derma_Query("Are you sure you want to reset this plugins config & store?", "Confirmation",
+            "No", function() end,
+            "Yes", function() menup.db.del("data_" .. manifest.id) end)
+        end
+    end
 end
 
 local PANEL = {}
