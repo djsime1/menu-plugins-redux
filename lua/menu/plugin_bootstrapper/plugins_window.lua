@@ -10,16 +10,13 @@ function PANEL:Init()
     self:SetDraggable(true)
     self:SetScreenLock(true)
     self:SetSizable(true)
-
     local tabs = vgui.Create("DPropertySheet", self)
     tabs:Dock(FILL)
     tabs:SetFadeTime(0)
     self.tabs = tabs
-
     local plist = self:Add("PluginsPanel")
     tabs:AddSheet("Installed plugins", plist, "icon16/box.png")
     self.plist = plist
-
     local find = vgui.Create("DPanel")
     tabs:AddSheet("Find more", find, "icon16/add.png")
     local resetwip = find:Add("DButton")
@@ -28,18 +25,19 @@ function PANEL:Init()
     local wip = find:Add("WIPFrame")
     wip:Dock(FILL)
     find.Paint = function() end
+
     resetwip.DoClick = function()
         for k, v in ipairs(wip.bouncies) do
             v:Remove()
             wip.bouncies[k] = nil
         end
+
         wip:AddBouncy()
     end
+
     find.resetwip = resetwip
     find.wip = wip
     self.find = find
-
-
     local about = self:Add("MarkdownPanel")
     tabs:AddSheet("About/Credits", about, "icon16/information.png")
     about:SetMarkdown([[
@@ -59,13 +57,13 @@ The Redux version extends the existing Menu Plugins framework while retaining co
 - *[You](https://steamcommunity.com/my)* : For being epic **<3**  
 ]])
     self.about = about
-
     self.btnClose:MoveToFront()
     self.btnMaxim:Hide()
     self.btnMinim:Hide()
 end
 
-function PANEL:Paint(w, h) end
+function PANEL:Paint(w, h)
+end
 
 vgui.Register("PluginsWindow", PANEL, "DFrame")
 

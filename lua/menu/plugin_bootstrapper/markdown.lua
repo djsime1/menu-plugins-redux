@@ -1,6 +1,5 @@
 -- Modified from https://github.com/mpeterv/markdown, MIT Licensed.
 -- Used to render README's and about/credits page.
-
 ----------------------------------------------------------------------
 -- Utility functions
 ----------------------------------------------------------------------
@@ -1201,7 +1200,6 @@ end
 ----------------------------------------------------------------------
 -- End of module
 ----------------------------------------------------------------------
-
 -- Markdown Panel
 local PANEL = {}
 
@@ -1221,10 +1219,13 @@ function PANEL:Init()
 end
 
 function PANEL:OnDocumentReady()
-    self:AddFunction("lua", "Callback", function(hash)
-        if self.hashes[hash] ~= nil then self.hashes[hash]()
-        else print("Unknown hash: " .. hash) end
-    end)
+    -- self:AddFunction("lua", "Callback", function(hash)
+    --     if self.hashes[hash] ~= nil then
+    --         self.hashes[hash]()
+    --     else
+    --         print("Unknown hash: " .. hash)
+    --     end
+    -- end)
 
     self:AddFunction("lua", "Open", function(url)
         gui.OpenURL(url)
@@ -1241,11 +1242,11 @@ function PANEL:SetMarkdown(txt)
     self:SetBody(markdown(txt))
 end
 
-function PANEL:AddHash(title, callback)
-    self.hashes[title] = callback
-end
+-- function PANEL:AddHash(title, callback)
+--     self.hashes[title] = callback
+-- end
 
 vgui.Register("MarkdownPanel", PANEL, "DHTML")
-
 menup.markdown = markdown
+
 return markdown
