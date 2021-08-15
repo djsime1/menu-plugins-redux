@@ -1,3 +1,5 @@
+-- I don't recall where I got this script from, forgive me if it's yours.
+
 local function lua_run_menu(_, _, _, code)
     local func = CompileString(code, "", false)
 

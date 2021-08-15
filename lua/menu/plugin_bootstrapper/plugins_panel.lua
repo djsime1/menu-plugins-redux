@@ -1,5 +1,30 @@
 local InfoPanel = table.Copy(vgui.GetControlTable("DPanel"))
 
+local function LegacyConfig(v)
+    local dm = DermaMenu()
+
+    for i, _ in pairs(v.config) do
+        local x = menup.config.get(v.id, i)
+        local cv = dm:AddOption(i)
+
+        cv.DoClick = function()
+            Derma_StringRequest("Change option", v.name .. "." .. i .. " = " .. tostring(x), tostring(x), function(txt)
+                menup.config.set(v.id, i, tonumber(txt) == nil and txt or tonumber(txt))
+            end)
+        end
+
+        if x == "true" or x == 1 or x == true then
+            cv:SetIcon("icon16/tick.png")
+        elseif x == "false" or x == 0 or x == false then
+            cv:SetIcon("icon16/cross.png")
+        else
+            cv:SetIcon("icon16/pencil.png")
+        end
+    end
+
+    dm:Open()
+end
+
 local cfpnls = {
     bool = function(id, key, data)
         local val = menup.config.get(id, key, isbool(data[3]) and data[3] or false)
@@ -285,9 +310,9 @@ function InfoPanel:Load(manifest)
             self.alt:SetText("Config")
             self.alt:SetIcon("icon16/cog.png")
         else -- reset
-            Derma_Query("Are you sure you want to reset this plugins config & store?", "Confirmation", "No", function() end, "Yes", function()
+            Derma_Query("Are you sure you want to reset this plugins config & store?", "Confirmation", "Yes", function()
                 menup.db.del("data_" .. manifest.id)
-            end)
+            end, "No")
         end
     end
 end
@@ -383,27 +408,7 @@ function PANEL:Init()
             toggle:SetText("")
 
             alt.DoClick = function()
-                local dm = DermaMenu()
-
-                for i, x in pairs(v.config) do
-                    local cv = dm:AddOption(i)
-
-                    cv.DoClick = function()
-                        Derma_StringRequest("Change option", v.name .. "." .. i .. " = " .. tostring(x), tostring(x), function(txt)
-                            menup.config.set(v.id, txt) -- forgive me glualint
-                        end)
-                    end
-
-                    if x == "true" or x == 1 or x == true then
-                        cv:SetIcon("icon16/tick.png")
-                    elseif x == "false" or x == 0 or x == false then
-                        cv:SetIcon("icon16/cross.png")
-                    else
-                        cv:SetIcon("icon16/pencil.png")
-                    end
-                end
-
-                dm:Open()
+                LegacyConfig(v)
             end
 
             toggle.DoClick = function()
