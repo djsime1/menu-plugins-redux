@@ -69,9 +69,13 @@ local cfpnls = {
         label:SetText(data[1])
         label:SetTextColor(Color(0, 0, 0))
 
-        wang.OnValueChanged = function(pnl, newval)
-            newval = math.Round(newval)
-            wang:SetText(tostring(newval))
+        wang.OnValueChanged = function(pnl, val)
+            newval = math.Round(val)
+
+            if val ~= newval then
+                wang:SetText(tostring(newval))
+            end
+
             menup.config.set(id, key, newval)
         end
 
@@ -225,27 +229,9 @@ function InfoPanel:Think()
 end
 
 function InfoPanel:SetEnabled(state)
-    local plugs = util.JSONToTable(menup.db.get("enabled", "{}"))
-    local manifest = self.manifest
     self.target = 0
-    manifest.enabled = state
-    plugs[manifest.id] = state
-    menup.db.set("enabled", util.TableToJSON(plugs, false))
-
-    if state then
-        local success, result = pcall(manifest.func)
-
-        if not success then
-            ErrorNoHalt("Error loading " .. manifest.id .. ":\n" .. result)
-        elseif isfunction(result) then
-            manifest.undo = result
-        else
-            manifest.undo = function() end
-        end
-    else
-        manifest.undo()
-    end
-
+    local manifest = self.manifest
+    menup.control[state and "enable" or "disable"](manifest.id)
     self:GetParent().toggle:SetChecked(state)
     self:Load(manifest)
 end
@@ -254,7 +240,7 @@ function InfoPanel:BuildConfig(manifest)
     self.cp:Clear()
 
     -- name type param desc
-    for k, v in SortedPairsByMemberValue(manifest.config, 1) do
+    for k, v in SortedPairs(manifest.config) do
         if isfunction(cfpnls[v[2]]) then
             local pnl = cfpnls[v[2]](manifest.id, k, v)
             self.cp:AddItem(pnl)
@@ -412,20 +398,8 @@ function PANEL:Init()
             end
 
             toggle.DoClick = function()
-                local plugs = util.JSONToTable(menup.db.get("enabled", "{}"))
                 local state = not v.enabled
-                v.enabled = state
-                plugs[v.id] = state
-                menup.db.set("enabled", util.TableToJSON(plugs, false))
-
-                if state then
-                    local success, result = pcall(v.func)
-
-                    if not success then
-                        ErrorNoHalt("Error loading " .. v.id .. ":\n" .. result)
-                    end
-                end
-
+                menup.control[state and "enable" or "disable"](v.id)
                 alt:SetEnabled(v.enabled and not table.IsEmpty(v.config))
                 toggle:SetIcon(v.enabled and "icon16/lightbulb.png" or "icon16/lightbulb_off.png")
             end

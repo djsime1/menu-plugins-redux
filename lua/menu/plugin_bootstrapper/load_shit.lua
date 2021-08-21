@@ -1,5 +1,6 @@
 -- call me crazy for how i do this
 menup.plugins = {}
+menup.control = {}
 local meta, env, manifest = {}, {}, nil
 local shouldload = util.JSONToTable(menup.db.get("enabled", "{}"))
 
@@ -19,7 +20,6 @@ local manifest_default = {
 --     string = "",
 --     select = "",
 -- }
-
 function meta:__call()
 end
 
@@ -29,67 +29,149 @@ function env.menup(perhaps)
     manifest = perhaps
 end
 
-if not file.IsDir("lua/menu_plugins", "GAME") then return print("Missing menu_plugins folder in garrysmod/lua!!") end
-local files, _ = file.Find("lua/menu_plugins/*.lua", "GAME")
-print("Now loading plugins...")
-
-for _, v in ipairs(files) do
-    local name = string.StripExtension(v)
-    local script = file.Read("lua/menu_plugins/" .. v, "GAME")
-    local trial = CompileString(script, v, false)
-
-    if isstring(trial) then
-        ErrorNoHalt("Error loading file " .. v .. ":\n" .. trial)
-        continue
+function menup.control.load(fileorfunc, name)
+    if isfunction(fileorfunc) and not isstring(name) then
+        error("Calling load with a function MUST also supply a name!")
     end
 
-    setfenv(trial, env)
-    pcall(trial)
-    setfenv(trial, _G)
+    if isstring(fileorfunc) then
+        name = name or string.StripExtension(string.Right(fileorfunc, #fileorfunc - #string.GetPathFromFilename(fileorfunc)))
+        local script = file.Read(fileorfunc, "GAME")
+
+        if not script then
+            error("File " .. fileorfunc .. " doesn't exist!\n(Is the path based from garrysmod?)")
+        end
+
+        fileorfunc = CompileString(script, fileorfunc, false)
+
+        if isstring(fileorfunc) then
+            error("Error loading plugin " .. fileorfunc .. ":\n" .. trial)
+        end
+    end
+
+    setfenv(fileorfunc, env)
+    pcall(fileorfunc)
+    setfenv(fileorfunc, _G)
 
     -- new plugin
     if istable(manifest) then
         manifest.config = manifest.config or {}
-        manifest.file = v
         manifest.legacy = false
-        manifest.func = trial
+        manifest.func = fileorfunc
     else -- legacy plugin
         manifest = table.Copy(manifest_default)
         manifest.id = "legacy." .. name
         manifest.name = name
         manifest.config = {}
-        manifest.file = v
         manifest.legacy = true
-        manifest.func = trial
+        manifest.func = fileorfunc
     end
 
-    menup.plugins[manifest.id] = table.Copy(manifest)
-    manifest = menup.plugins[manifest.id]
+    local temp = table.Copy(manifest)
+    manifest = nil
+
+    return temp
+end
+
+function menup.control.run(id)
+    local manifest = menup.plugins[id]
+
+    if not manifest.enabled then
+        ErrorNoHalt("Running plugin " .. id .. " despite it being disabled.")
+    end
+
+    local success, result = pcall(manifest.func)
+
+    if not success then
+        ErrorNoHaltWithStack("Error running plugin " .. id .. ":\n" .. result)
+    elseif isfunction(result) then
+        manifest.undo = result
+    else
+        manifest.undo = nil -- function() end
+    end
+
+    return success
+end
+
+function menup.control.undo(id)
+    local manifest = menup.plugins[id]
+
+    if isfunction(manifest.undo) then
+        local success, result = pcall(manifest.undo)
+
+        if not success then
+            ErrorNoHaltWithStack("Error undoing plugin " .. id .. ":\n" .. result)
+
+            return false
+        else
+            return result ~= nil and result or true
+        end
+    else
+        return false
+    end
+end
+
+function menup.control.shouldload(id, enabled)
+    local shouldload = util.JSONToTable(menup.db.get("enabled", "{}"))
+    enabled = enabled ~= nil and enabled or menup.plugins[id].enabled
+    menup.db.set("enabled", util.TableToJSON(shouldload, false))
+end
+
+function menup.control.enable(id, save)
+    local manifest = menup.plugins[id]
+    save = save ~= nil and save or true
+
+    if not istable(manifest) then
+        error("Attempted to enable unregistered plugin " .. id .. ".")
+    end
+
+    manifest.enabled = true
+
+    if save then
+        menup.control.shouldload(id, true)
+    end
+
+    return menup.control.run(id)
+end
+
+function menup.control.disable(id, save)
+    local manifest = menup.plugins[id]
+    save = save ~= nil and save or true
+
+    if not istable(manifest) then
+        error("Attempted to disable unregistered plugin " .. id .. ".")
+    end
+
+    manifest.enabled = false
+
+    if save then
+        menup.control.shouldload(id, false)
+    end
+
+    return menup.control.undo(id)
+end
+
+if not file.IsDir("lua/menu_plugins", "GAME") then
+    error("Missing menu_plugins folder in garrysmod/lua!!")
+end
+
+local files, _ = file.Find("lua/menu_plugins/*.lua", "GAME")
+print("Now loading plugins...")
+
+for _, v in ipairs(files) do
+    local manifest = menup.control.load("lua/menu_plugins/" .. v)
+    if not istable(manifest) then continue end
+    manifest.file = v
+    menup.plugins[manifest.id] = manifest
 
     if shouldload[manifest.id] then
         print(manifest.id .. " (" .. v .. ") is ENABLED.")
-        manifest.enabled = true
-        -- if not table.IsEmpty(manifest.config) then
-        --     for ck, cv in pairs(manifest.config) do
-        --         menup.config.set(manifest.id, ck, cv[3] ~= nil and cv[3] or config_default[cv[2]])
-        --     end
-        -- end
-        local success, result = pcall(trial)
-
-        if not success then
-            ErrorNoHalt("Error loading " .. manifest.id .. ":\n" .. result)
-        elseif isfunction(result) then
-            manifest.undo = result
-        else
-            manifest.undo = function() end
-        end
+        menup.control.enable(manifest.id, false)
     else
         print(manifest.id .. " (" .. v .. ") is disabled.")
         manifest.enabled = false
         shouldload[manifest.id] = false
     end
-
-    manifest = nil
 end
 
 menup.db.set("enabled", util.TableToJSON(shouldload, false))
