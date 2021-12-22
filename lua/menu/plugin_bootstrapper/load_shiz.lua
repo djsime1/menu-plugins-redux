@@ -67,6 +67,7 @@ function menup.control.load(fileorfunc, name)
         manifest.func = fileorfunc
     end
 
+    hook.Run("PluginLoaded", manifest)
     local temp = table.Copy(manifest)
     manifest = nil
 
@@ -80,6 +81,7 @@ function menup.control.run(id)
         ErrorNoHalt("Running plugin " .. id .. " despite it being disabled.")
     end
 
+    hook.Run("PluginRun", manifest)
     local success, result = pcall(manifest.func)
 
     if not success then
@@ -97,6 +99,7 @@ function menup.control.undo(id)
     local manifest = menup.plugins[id]
 
     if isfunction(manifest.undo) then
+        hook.Run("PluginUndo", manifest)
         local success, result = pcall(manifest.undo)
 
         if not success then
@@ -114,6 +117,7 @@ end
 function menup.control.shouldload(id, enabled)
     local shouldload = util.JSONToTable(menup.db.get("enabled", "{}"))
     enabled = enabled ~= nil and enabled or menup.plugins[id].enabled
+    shouldload[id] = enabled
     menup.db.set("enabled", util.TableToJSON(shouldload, false))
 end
 
@@ -126,6 +130,7 @@ function menup.control.enable(id, save)
     end
 
     manifest.enabled = true
+    hook.Run("PluginEnabled", manifest)
 
     if save then
         menup.control.shouldload(id, true)
@@ -143,6 +148,7 @@ function menup.control.disable(id, save)
     end
 
     manifest.enabled = false
+    hook.Run("PluginDisabled", manifest)
 
     if save then
         menup.control.shouldload(id, false)

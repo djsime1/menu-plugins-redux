@@ -2,7 +2,7 @@ local MANIFEST = {
     id = "djsime1.calculator",
     author = "djsime1",
     name = "Simple calculator",
-    description = "A very simple calculator to demonstrate Menu Plugins Redux.",
+    description = "Placeholder until I decide to actually program this thing.",
     version = "1.0",
 }
 

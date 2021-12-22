@@ -5,7 +5,10 @@
 !VERSION
 !/lua
 !/lua/menu_plugins
-!/lua/menu_plugins/**
+!/lua/menu_plugins/calculator.lua
+!/lua/menu_plugins/config_example.lua
+!/lua/menu_plugins/gradient_bg.lua
+!/lua/menu_plugins/pling.lua
 !/lua/menu
 !/lua/menu/menu.lua
 !/lua/menu/menu_plugins.lua

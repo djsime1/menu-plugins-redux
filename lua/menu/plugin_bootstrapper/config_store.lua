@@ -18,6 +18,10 @@ local function dbdel(key)
     delq[key] = true
 end
 
+local function dblist(query)
+    return sql.Query("SELECT * FROM menup_redux WHERE key LIKE " .. SQLStr(query) .. "")
+end
+
 local function process()
     if table.IsEmpty(writeq) and table.IsEmpty(delq) then return end
     sql.Begin()
@@ -44,6 +48,8 @@ menup.config.set = function(id, key, value)
         data.config = util.JSONToTable(data.config)
     end
 
+    local old = data.config[key]
+    hook.Run("ConfigChange", id, key, value, old)
     data.config[key] = value
     dbset("data_" .. id, util.TableToJSON(data, false))
 end
@@ -95,9 +101,14 @@ function menup.options.setOption(id, key, value)
     menup.config.set("legacy." .. id, key, value)
 end
 
--- i'll do it later
 function menup.options.getTable()
-    return {}
+    local res = dblist("data_legacy.%")
+    if not res then return {} end
+    local out = {}
+    for _, v in ipairs(res) do
+        out[string.sub(v.key, 13)] = util.JSONToTable(v.value).config
+    end
+    return out
 end
 
 function menup.include(path)
@@ -108,4 +119,5 @@ menup.db = {} -- please dont use this in a plugin
 menup.db.get = dbget
 menup.db.set = dbset
 menup.db.del = dbdel
+menup.db.list = dblist
 timer.Create("menup_db", 1, 0, process)

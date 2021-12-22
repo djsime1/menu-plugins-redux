@@ -44,6 +44,7 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         cb.OnChange = function(pnl, newval)
+            -- hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -70,12 +71,13 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         wang.OnValueChanged = function(pnl, val)
-            newval = math.Round(val)
+            local newval = math.Round(val)
 
             if val ~= newval then
                 wang:SetText(tostring(newval))
             end
 
+            -- hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -101,6 +103,7 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         wang.OnValueChanged = function(pnl, newval)
+            -- hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -126,6 +129,7 @@ local cfpnls = {
         slider:SetDark(true)
 
         slider.OnValueChanged = function(pnl, newval)
+            -- hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -150,6 +154,7 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         tbox.OnLoseFocus = function(pnl)
+            -- hook.Run("UserConfigChange", id, key, pnl:GetText(), val)
             menup.config.set(id, key, pnl:GetText())
         end
 
@@ -183,6 +188,7 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         combo.OnSelect = function(pnl, newval)
+            -- hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -251,6 +257,17 @@ function InfoPanel:BuildConfig(manifest)
             print(manifest.id .. " has unknown config type \"" .. v[2] .. "\" for key \"" .. k .. "\"!")
         end
     end
+
+    local apply = self.cp:Add("DButton")
+    apply:Dock(TOP)
+    apply:DockPadding(4, 4, 4, 4)
+    apply:DockMargin(32, 8, 32, 0)
+    apply:SetTall(32)
+    apply:SetText("Apply settings")
+    apply:SetIcon("icon16/disk.png")
+    apply.DoClick = function()
+        hook.Run("ConfigApply", manifest.id)
+    end
 end
 
 function InfoPanel:Load(manifest)
@@ -297,6 +314,7 @@ function InfoPanel:Load(manifest)
             self.alt:SetIcon("icon16/cog.png")
         else -- reset
             Derma_Query("Are you sure you want to reset this plugins config & store?", "Confirmation", "Yes", function()
+                hook.Run("PluginReset", manifest)
                 menup.db.del("data_" .. manifest.id)
             end, "No")
         end

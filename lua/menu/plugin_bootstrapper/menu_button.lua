@@ -122,17 +122,21 @@ end
 
 function menup.toolbar.setparent(pnl)
     local drawer = IsValid(menup.toolbar.drawer) and menup.toolbar.drawer or BuildDrawer()
-    drawer:MakePopup()
-    drawer.ToggleButton:MakePopup()
-    drawer:SetParent(pnl)
+    -- TODO: Make the drawer stay on top without stealing focus from menu HTML (Breaks text entry)
+    -- drawer:KillFocus()
+    -- drawer.ToggleButton:KillFocus()
+    -- drawer:SetParent(pnl)
+    -- drawer:MakePopup()
+    -- drawer.ToggleButton:MakePopup()
 end
 
 function ShowPluginsDrawer()
     menup.toolbar.drawer:Toggle()
 end
 
-hook.Add("GameContentChanged", "menup_button", function()
-    hook.Remove("GameContentChanged", "menup_button")
+hook.Add("DrawOverlay", "menup_button", function()
+    hook.Remove("DrawOverlay", "menup_button")
+    hook.Run("MenuVGUIReady")
 
     if pnlMainMenu and pnlMainMenu.HTML and vgui.GetControlTable("MainMenuPanel") then
         print("Pretty sure this is the default menu, injecting button!")
@@ -143,7 +147,7 @@ hook.Add("GameContentChanged", "menup_button", function()
         navright.appendChild(container);
         container.innerHTML = `<li class="smallicon hidelabel" onclick="lua.Run('ShowPluginsWindow()')"><img src='asset://garrysmod/materials/icon16/plugin.png'><span>Plugins</span></li>`
         ]])
-        menup.toolbar.setparent(pnlMainMenu)
+        menup.toolbar.setparent(pnlMainMenu.HTML)
     else
         print("Custom menu detected, open plugins window by running menu_plugins.")
     end
