@@ -11,7 +11,7 @@ local MANIFEST = {
     id = "djsime1.config_example",
     author = "djsime1",
     name = "Config example",
-    description = "Configure me then run configexample",
+    description = "Demonstrates all possible types of configuration options.",
     version = "1.0",
     config = CONFIG
 }

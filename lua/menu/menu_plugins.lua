@@ -1,4 +1,3 @@
-local release = 1
 local banner = [[
 +-----------------------------------------------------------+
      __  __                    ___ _
@@ -16,24 +15,26 @@ local banner = [[
 ]]
 local message = string.Explode("\n", banner, false)
 local longest = 0
+
 for k, v in pairs(message) do
-	if v:len() > longest then longest = v:len() end
+    if v:len() > longest then
+        longest = v:len()
+    end
 end
 
 MsgN()
 
 for k, line in pairs(message) do
-	for i = 1, line:len() do
-		local hue = ((i-1) / longest) * 360
-		MsgC(HSVToColor(hue, 0.375, 1), line:sub(i, i))
-	end
-	MsgN()
+    for i = 1, line:len() do
+        local hue = ((i - 1) / longest) * 360
+        MsgC(HSVToColor(hue, 0.375, 1), line:sub(i, i))
+    end
+
+    MsgN()
 end
 
 MsgN()
-
 _G.menup = {}
-
 include("plugin_bootstrapper/markdown.lua")
 include("plugin_bootstrapper/wip_panel.lua")
 include("plugin_bootstrapper/plugins_panel.lua")
@@ -41,4 +42,4 @@ include("plugin_bootstrapper/plugins_window.lua")
 include("plugin_bootstrapper/menu_button.lua")
 include("plugin_bootstrapper/menu_dev.lua")
 include("plugin_bootstrapper/config_store.lua")
-include("plugin_bootstrapper/load_shit.lua")
+include("plugin_bootstrapper/load_shiz.lua")
