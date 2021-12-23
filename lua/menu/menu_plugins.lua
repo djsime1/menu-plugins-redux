@@ -1,4 +1,4 @@
-local banner = [[
+local splash = [[
 +-----------------------------------------------------------+
      __  __                    ___ _
     |  \/  |___ _ _ _  _      | _ \ |_  _ __ _(_)_ _  ___
@@ -13,24 +13,18 @@ local banner = [[
 
 +-----------------------------------------------------------+
 ]]
-local message = string.Explode("\n", banner, false)
-local longest = 0
 
-for k, v in pairs(message) do
-    if v:len() > longest then
-        longest = v:len()
+local l = 0
+local hs = math.Rand(0, 360)
+local he = hs + (180 * table.Random({-1, 1}))
+for i = 1, #splash do
+    if splash[i] == "\n" then
+        l = 0
+        MsgC("\n")
+    else
+        l = l + 1
+        MsgC(HSVToColor(Lerp(l / 61, hs, he), .6, 1),splash[i])
     end
-end
-
-MsgN()
-
-for k, line in pairs(message) do
-    for i = 1, line:len() do
-        local hue = ((i - 1) / longest) * 360
-        MsgC(HSVToColor(hue, 0.375, 1), line:sub(i, i))
-    end
-
-    MsgN()
 end
 
 MsgN()
