@@ -55,6 +55,12 @@ The Redux version extends the existing Menu Plugins framework while retaining co
 - *[markdowncss](https://github.com/markdowncss)* : Modest CSS.  
 - *[Garry](https://garry.tv)* : Obligatory thanks.  
 - *[You](https://steamcommunity.com/my)* : For being epic **<3**  
+
+## Licenses
+[MPR is licensesd under the MIT license](https://github.com/djsime1/menu-plugins-redux/blob/dev/LICENSE).  
+In addition, the following licenses apply to libraries/code used within MPR:  
+- [markdown.lua](https://github.com/mpeterv/markdown): [MIT license](https://github.com/mpeterv/markdown/blob/master/LICENSE).  
+- [Modest CSS](https://github.com/markdowncss/modest): [MIT license](https://github.com/markdowncss/modest/blob/master/LICENSE).  
 ]])
     self.about = about
     self.btnClose:MoveToFront()
