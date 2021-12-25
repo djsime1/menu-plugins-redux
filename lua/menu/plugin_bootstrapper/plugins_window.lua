@@ -49,18 +49,20 @@ They're like addons, but for the main/pause menu.
 The Redux version extends the existing Menu Plugins framework while retaining compatibility with existing scripts.  
 
 ## Credits
-- *[djsime1](https://dj.je)* : Authoring the majority of this.  
+- *[djsime1](https://github.com/djsime1)* : Lead author of this mess.  
 - *[GLua team](https://github.com/glua)* : Original menu plugins.  
 - *[mpeterv](https://github.com/mpeterv)* : markdown.lua.  
 - *[markdowncss](https://github.com/markdowncss)* : Modest CSS.  
+- *[vercas](https://github.com/vercas)* : vON.  
 - *[Garry](https://garry.tv)* : Obligatory thanks.  
 - *[You](https://steamcommunity.com/my)* : For being epic **<3**  
 
 ## Licenses
 [MPR is licensesd under the MIT license](https://github.com/djsime1/menu-plugins-redux/blob/dev/LICENSE).  
 In addition, the following licenses apply to libraries/code used within MPR:  
-- [markdown.lua](https://github.com/mpeterv/markdown): [MIT license](https://github.com/mpeterv/markdown/blob/master/LICENSE).  
-- [Modest CSS](https://github.com/markdowncss/modest): [MIT license](https://github.com/markdowncss/modest/blob/master/LICENSE).  
+- [markdown.lua](https://github.com/mpeterv/markdown) : [MIT license](https://github.com/mpeterv/markdown/blob/master/LICENSE).  
+- [Modest CSS](https://github.com/markdowncss/modest) : [MIT license](https://github.com/markdowncss/modest/blob/master/LICENSE).  
+- [vON](https://github.com/vercas/vON) :[Read here](https://github.com/vercas/vON/blob/master/von.lua#L1:L23).  
 ]])
     self.about = about
     self.btnClose:MoveToFront()
