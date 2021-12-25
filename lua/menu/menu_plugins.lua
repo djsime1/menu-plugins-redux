@@ -29,7 +29,7 @@ end
 
 MsgN()
 _G.menup = {}
-include("plugin_bootstrapper/markdown.lua")
+include("plugin_bootstrapper/md_panel.lua")
 include("plugin_bootstrapper/wip_panel.lua")
 include("plugin_bootstrapper/plugins_panel.lua")
 include("plugin_bootstrapper/plugins_window.lua")
