@@ -10,7 +10,7 @@
 <h2>✨ Features</h2>
 <ul>
   <li>🖥️ GUI to manage & configure plugins.</li>
-  <li>📁 A custom toolbar to quickly access plugin functionality. 🔸</li>
+  <li>📁 A nifty drawer to quickly access plugin functionality.</li>
   <li>🧩 Some sample plugins to get you started.</li>
   <li>✅ Fully compatible with legacy menu plugins!</li>
   <li>🔎 Search & install plugins without leaving the game. 🔸</li>
@@ -20,6 +20,15 @@
 <hr>
 <h2>📥 Installation</h2>
 <i>💭 You can click on each step for more details.</i><br><br>
+<details>
+  <summary>🌐 Recommended: Switch to the x64-86 beta branch.</summary>
+  Why? Because it makes most things work smoother. It can also increase your games performance!
+  <ol>
+    <li>In Steam, open Garry's Mod properties (Located in the gear icon.)</li>
+    <li>Go to the Betas tab (Click "Betas" on the left side)</li>
+    <li>From the dropdown, select the option starting with "x86-64" (Not the one starting with "Chromium.")</li>
+  </ol>
+</details>
 <details>
   <summary>1️⃣ Find your Garry's Mod installation directory and open it.</summary>
   <br><img src="https://user-images.githubusercontent.com/8518150/147179108-3e586cc3-7f76-452c-a932-599a0cfee420.png">
@@ -47,6 +56,12 @@
 <details>
   <summary>4️⃣ Overwrite files if prompted.</summary>
   <br><img src="https://user-images.githubusercontent.com/8518150/147179554-4c7cec64-db60-4b53-81c4-6d405fc70e06.png">
+</details>
+<details>
+  <summary>👍 Launch the game!</summary>
+  If everything was successful, then MPR should now be installed and active!<br>
+  Assuming you're on the x86-64 branch, there should be a new button on the main menu toolbar named "Plugins."<br>
+  There should also be a fancy banner in your console. Running the command <code>menu_plugins</code> will open a GUI.<br>
 </details>
 <hr>
 <h2>👨‍💻 Development & Contributing</h2>
