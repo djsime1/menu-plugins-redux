@@ -8,8 +8,8 @@ local MANIFEST = {
 
 menup(MANIFEST)
 
-menup.toolbar.add(MANIFEST.id, "Calculator", "icon16/calculator.png")
+menup.drawer.add(MANIFEST.id, "Calculator", function() end, "icon16/calculator.png")
 
 return function()
-    menup.toolbar.del(MANIFEST.id)
+    menup.drawer.del(MANIFEST.id)
 end

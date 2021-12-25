@@ -1,5 +1,7 @@
 local writeq = {}
 local delq = {}
+local von = include("lib/von.lua")
+menup.von = von
 
 if not sql.TableExists("menup_redux") then
     print("Creating SQL table.")
