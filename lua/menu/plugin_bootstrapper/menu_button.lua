@@ -1,17 +1,17 @@
-menup.toolbar = {}
-menup.toolbar.buttons = {}
+menup.drawer = {}
+menup.drawer.buttons = {}
 
-function menup.toolbar.add(id, title, cb, icon)
-    menup.toolbar.buttons[id] = {title, cb, icon}
+function menup.drawer.add(id, title, cb, icon)
+    menup.drawer.buttons[id] = {title, cb, icon}
 end
 
-function menup.toolbar.del(id)
-    menup.toolbar.buttons[id] = nil
+function menup.drawer.del(id)
+    menup.drawer.buttons[id] = nil
 end
 
-function menup.toolbar.open(x, y)
+function menup.drawer.open(x, y)
     local dm = DermaMenu()
-    for k, v in pairs(menup.toolbar.buttons) do
+    for k, v in SortedPairs(menup.drawer.buttons) do
         local btn = dm:AddOption(v[1], v[2])
         if v[3] then
             btn:SetIcon(v[3])
@@ -37,11 +37,11 @@ hook.Add("DrawOverlay", "menup_button", function()
         var container = document.createElement("span");
         container.setAttribute("id", "PluginsButton")
         navright.appendChild(container);
-        container.innerHTML = `<li class="smallicon hidelabel" onclick="lua.Run('if table.Count(menup.toolbar.buttons) == 0 then ShowPluginsWindow() else menup.toolbar.open() end')"><img src='asset://garrysmod/materials/icon16/plugin.png'><span>Plugins</span></li>`
+        container.innerHTML = `<li class="smallicon hidelabel" onclick="lua.Run('if table.Count(menup.drawer.buttons) == 0 then ShowPluginsWindow() else menup.drawer.open() end')"><img src='asset://garrysmod/materials/icon16/plugin.png'><span>Plugins</span></li>`
         ]])
     else
         print("Custom menu detected, open plugins window by running menu_plugins.")
     end
 end)
 
-concommand.Add("menup_drawer", menup.toolbar.open)
+concommand.Add("menup_drawer", menup.drawer.open)
