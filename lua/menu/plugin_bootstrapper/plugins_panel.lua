@@ -44,12 +44,13 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         cb.OnChange = function(pnl, newval)
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
         return root
     end,
+
     int = function(id, key, data)
         local val = menup.config.get(id, key, isnumber(data[3]) and data[3] or 0)
         local root = vgui.Create("DPanel")
@@ -77,12 +78,13 @@ local cfpnls = {
                 wang:SetText(tostring(newval))
             end
 
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
         return root
     end,
+
     float = function(id, key, data)
         local val = menup.config.get(id, key, isnumber(data[3]) and data[3] or 0)
         local root = vgui.Create("DPanel")
@@ -103,12 +105,13 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         wang.OnValueChanged = function(pnl, newval)
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
         return root
     end,
+
     range = function(id, key, data)
         local min, max, default = data[3][1], data[3][2], data[3][3]
         min = (min ~= nil and min or 0)
@@ -129,12 +132,13 @@ local cfpnls = {
         slider:SetDark(true)
 
         slider.OnValueChanged = function(pnl, newval)
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
         return root
     end,
+
     string = function(id, key, data)
         local val = menup.config.get(id, key, isstring(data[3]) and data[3] or "")
         local root = vgui.Create("DPanel")
@@ -154,12 +158,14 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         tbox.OnLoseFocus = function(pnl)
-            -- hook.Run("UserConfigChange", id, key, pnl:GetText(), val)
-            menup.config.set(id, key, pnl:GetText())
+            local newval = pnl:GetText()
+            hook.Run("UserConfigChange", id, key, newval, val)
+            menup.config.set(id, key, newval)
         end
 
         return root
     end,
+
     select = function(id, key, data)
         local val = menup.config.get(id, key, isnumber(data[3][1]) and data[3][1] or 1)
         local root = vgui.Create("DPanel")
@@ -188,7 +194,7 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         combo.OnSelect = function(pnl, newval)
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 

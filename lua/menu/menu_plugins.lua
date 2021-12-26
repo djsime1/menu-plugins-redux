@@ -14,16 +14,15 @@ local splash = [[
 +-----------------------------------------------------------+
 ]]
 
-local l = 0
-local hs = math.Rand(0, 360)
-local he = hs + (180 * table.Random({-1, 1}))
+local l, c1, c2 = 0, Color(0, 195, 255):ToVector() , Color(255, 255, 28):ToVector()
 for i = 1, #splash do
     if splash[i] == "\n" then
         l = 0
         MsgC("\n")
     else
         l = l + 1
-        MsgC(HSVToColor(Lerp(l / 61, hs, he), .6, 1),splash[i])
+        local cvec = LerpVector(l / 61, c1, c2) -- if Color:ToVector exists in menu, then why not Vector:ToColor??
+        MsgC(Color(cvec.x * 255, cvec.y * 255, cvec.z * 255), splash[i])
     end
 end
 
