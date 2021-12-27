@@ -1,5 +1,5 @@
 _G.menup = {}
-menup.version = "0.1.0" -- used to check for updates
+menup.version = "0.1.1" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
 Testing update checker
