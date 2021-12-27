@@ -36,6 +36,8 @@ local function check(url)
             silence:Dock(BOTTOM)
             silence.DoClick = function()
                 local times = {
+                    ["6 hours"] = 21600,
+                    ["12 hours"] = 43200,
                     ["1 day"] = 86400,
                     ["3 days"] = 172800,
                     ["A week"] = 604800,

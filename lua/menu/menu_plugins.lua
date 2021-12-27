@@ -1,8 +1,9 @@
 _G.menup = {}
-menup.version = "0.1.1" -- used to check for updates
+menup.version = "0.1.2" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
-Testing update checker
+- Make menu_dev.lua into a plugin.  
+- Add more time options to update checker.
 ]]
 
 local splash = [[
@@ -39,6 +40,6 @@ include("plugin_bootstrapper/wip_panel.lua")
 include("plugin_bootstrapper/plugins_panel.lua")
 include("plugin_bootstrapper/plugins_window.lua")
 include("plugin_bootstrapper/menu_button.lua")
-include("plugin_bootstrapper/menu_dev.lua")
+-- include("plugin_bootstrapper/menu_dev.lua") -- moved to plugin
 include("plugin_bootstrapper/config_store.lua")
 include("plugin_bootstrapper/load_shiz.lua")
