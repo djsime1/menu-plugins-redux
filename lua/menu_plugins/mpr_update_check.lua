@@ -27,8 +27,8 @@ http.Fetch(url, function(body)
     local ver, changelog = body:match("menup%.version = \"(%d+%.%d+%.%d+)\""), body:match("menup%.changelog = %[%[\n?(.-)\n?]]") or "No changelog."
     if not ver then print("MPR update check failed. (Couldn't find version string)") return end
     local cur, new = vnum(ver), vnum(menup.version)
-    if new >= cur then
-        print(string.format("MPR update avilable, %s -> %s", menup.version, ver))
+    if new > cur then
+        print(string.format("MPR update avilable! (%s -> %s)", menup.version, ver))
         local frame = vgui.Create("DFrame")
         frame:SetSize(800, 600)
         frame:Center()
