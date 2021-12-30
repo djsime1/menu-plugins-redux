@@ -71,7 +71,7 @@ function menup.control.load(fileorfunc, name)
         fileorfunc = CompileString(script, fileorfunc, false)
 
         if isstring(fileorfunc) then
-            error("Error loading plugin " .. fileorfunc .. ":\n" .. trial)
+            error("Error loading plugin " .. name .. ":\n" .. fileorfunc)
         end
     end
 
