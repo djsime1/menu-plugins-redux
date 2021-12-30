@@ -40,9 +40,7 @@ function PANEL:Init()
     self.find = find
     local about = self:Add("MarkdownPanel")
     tabs:AddSheet("About/Credits", about, "icon16/information.png")
-    about:SetMarkdown([[
-# Menu Plugins *Redux*
-
+    about:SetMarkdown("# Menu Plugins *Redux*\nVersion " .. menup.version .. [[. 
 ## About
 This modification was written to enable the usage of menu plugins.  
 They're like addons, but for the main/pause menu.  

@@ -29,6 +29,32 @@ function env.menup(perhaps)
     manifest = perhaps
 end
 
+function menup.control.preload(func)
+
+    setfenv(func, env)
+    pcall(func)
+    setfenv(func, _G)
+
+    -- new plugin
+    if istable(manifest) then
+        manifest.config = manifest.config or {}
+        manifest.legacy = false
+        manifest.func = func
+    else -- legacy plugin
+        manifest = table.Copy(manifest_default)
+        manifest.id = "legacy.unknown"
+        manifest.name = "Unknown"
+        manifest.config = {}
+        manifest.legacy = true
+        manifest.func = func
+    end
+
+    local temp = table.Copy(manifest)
+    manifest = nil
+
+    return temp
+end
+
 function menup.control.load(fileorfunc, name)
     if isfunction(fileorfunc) and not isstring(name) then
         error("Calling load with a function MUST also supply a name!")
@@ -49,27 +75,13 @@ function menup.control.load(fileorfunc, name)
         end
     end
 
-    setfenv(fileorfunc, env)
-    pcall(fileorfunc)
-    setfenv(fileorfunc, _G)
-
-    -- new plugin
-    if istable(manifest) then
-        manifest.config = manifest.config or {}
-        manifest.legacy = false
-        manifest.func = fileorfunc
-    else -- legacy plugin
-        manifest = table.Copy(manifest_default)
-        manifest.id = "legacy." .. name
-        manifest.name = name
-        manifest.config = {}
-        manifest.legacy = true
-        manifest.func = fileorfunc
+    local temp = menup.control.preload(fileorfunc)
+    if temp.legacy then
+        temp.id = "legacy." .. name
+        temp.name = name
     end
 
-    hook.Run("PluginLoaded", manifest)
-    local temp = table.Copy(manifest)
-    manifest = nil
+    hook.Run("PluginLoaded", temp)
 
     return temp
 end
