@@ -135,7 +135,12 @@ end
 
 function menup.control.enable(id, save)
     local manifest = menup.plugins[id]
-    save = save ~= nil and save or true
+
+    if save == nil then
+        save = true
+    else
+        save = false
+    end
 
     if not istable(manifest) then
         error("Attempted to enable unregistered plugin " .. id .. ".")
@@ -153,7 +158,12 @@ end
 
 function menup.control.disable(id, save)
     local manifest = menup.plugins[id]
-    save = save ~= nil and save or true
+
+    if save == nil then
+        save = true
+    else
+        save = false
+    end
 
     if not istable(manifest) then
         error("Attempted to disable unregistered plugin " .. id .. ".")
@@ -174,7 +184,8 @@ if not file.IsDir("lua/menu_plugins", "GAME") then
 end
 
 local files, _ = file.Find("lua/menu_plugins/*.lua", "GAME")
-print("Now loading plugins...")
+local start = SysTime()
+MsgC(Color(166, 166, 166), "+ ", Color(41, 121, 255), "[MPR]", Color(255, 255, 255), " Now loading plugins...\n")
 
 for _, v in ipairs(files) do
     local manifest = menup.control.load("lua/menu_plugins/" .. v)
@@ -183,14 +194,14 @@ for _, v in ipairs(files) do
     menup.plugins[manifest.id] = manifest
 
     if shouldload[manifest.id] then
-        print(manifest.id .. " (" .. v .. ") is ENABLED.")
+        MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", manifest.id, v), Color(0, 230, 118), "enabled.\n")
         menup.control.enable(manifest.id, false)
     else
-        print(manifest.id .. " (" .. v .. ") is disabled.")
+        MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", manifest.id, v), Color(255, 23, 68), "disabled.\n")
         manifest.enabled = false
         shouldload[manifest.id] = false
     end
 end
 
 menup.db.set("enabled", util.TableToJSON(shouldload, false))
-print("All done!")
+MsgC(Color(166, 166, 166), "+ ", Color(255, 255, 255), "Done! Plugins loaded in ", Color(41, 121, 255), tostring(math.Round((SysTime() - start) * 1000, 2)), Color(255, 255, 255), " milliseconds.\n")
