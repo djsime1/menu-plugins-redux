@@ -282,11 +282,10 @@ function InfoPanel:Load(manifest)
 *Version* : %s  
 *ID* : `%s`  
 *File* : `%s`  
-
 ]], manifest.name, manifest.description, manifest.author, manifest.version, manifest.id, manifest.file)
 
     if manifest.source then
-        info = info .. string.format("*Source* : `[%s](%s)`  \n", manifest.source:match("^https?://([^/]+)", manifest.source))
+        info = info .. string.format("*Source* : [%s](%s)  \n", manifest.source:match("^https?://([^/]+)"), manifest.source)
     end
 
     self.md:SetMarkdown(info)

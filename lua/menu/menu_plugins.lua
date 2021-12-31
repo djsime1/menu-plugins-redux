@@ -1,9 +1,10 @@
 _G.menup = {}
-menup.version = "0.1.3" -- used to check for updates
+menup.version = "0.1.4" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
+- Patch error caused when loading a broken plugin.  
 - Update checker now checks for plugin updates too.  
-- Added `menup.control.prelaod` for developers.  
+- Added `menup.control.preload` for developers.  
 - Added new fields to plugins manifest tables. (source & changelog)  
 ]]
 

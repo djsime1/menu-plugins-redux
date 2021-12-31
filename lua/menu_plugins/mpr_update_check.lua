@@ -11,7 +11,7 @@ local MANIFEST = {
     author = "djsime1",
     name = "Update checker",
     description = "Notifies when a new version of MPR and/or plugins are available.",
-    version = "1.2",
+    version = "1.3",
     config = CONFIG,
 }
 
@@ -76,7 +76,7 @@ local function pcheck(id, cb)
             return
         end
 
-        local new, cur = vnum(ver), vnum(menup.version)
+        local new, cur = vnum(ver), vnum(plugin.version)
 
         if new > cur then
             cb(true, {plugin.name, plugin.version, ver, plugin.source, manifest.changelog})
@@ -159,7 +159,7 @@ hook.Add("MenuVGUIReady", MANIFEST.id, function()
 
         count = count + 1
 
-        if count >= expecting then
+        if count >= expecting and #updates != 0 then
             popup(updates)
         end
     end
