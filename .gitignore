@@ -4,7 +4,6 @@
 !LICENSE
 !/lua
 !/lua/menu_plugins
-!/lua/menu_plugins/calculator.lua
 !/lua/menu_plugins/gradient_bg.lua
 !/lua/menu_plugins/pling.lua
 !/lua/menu_plugins/mpr_update_check.lua
