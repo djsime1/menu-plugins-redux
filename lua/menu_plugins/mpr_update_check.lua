@@ -11,7 +11,7 @@ local MANIFEST = {
     author = "djsime1",
     name = "Update checker",
     description = "Notifies when a new version of MPR and/or plugins are available.",
-    version = "1.1",
+    version = "1.2",
     config = CONFIG,
 }
 
@@ -58,14 +58,18 @@ end
 
 local function pcheck(id, cb)
     local plugin = menup.plugins[id]
+
     http.Fetch(plugin.source, function(body)
         local func = CompileString(body, "Update check", false)
+
         if isstring(func) then
             print(id .. " update check failed. (" .. func .. ")")
             cb(false)
         end
+
         local manifest = menup.control.preload(func)
         local ver = manifest.version
+
         if not ver then
             print(id .. " update check failed. (Couldn't find version string)")
 
@@ -161,6 +165,7 @@ hook.Add("MenuVGUIReady", MANIFEST.id, function()
     end
 
     mprcheck(url, cb)
+    if not menup.config.get(MANIFEST.id, "plugins", true) then return end
 
     for k, v in pairs(menup.plugins) do
         if not v.legacy and v.source and v.version then

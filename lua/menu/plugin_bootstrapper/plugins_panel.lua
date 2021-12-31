@@ -278,7 +278,7 @@ end
 
 function InfoPanel:Load(manifest)
     self.manifest = manifest
-    self.md:SetMarkdown(string.format([[
+    local info = string.format([[
 ## %s
 %s  
 ## 
@@ -286,7 +286,10 @@ function InfoPanel:Load(manifest)
 *Version* : %s  
 *ID* : `%s`  
 *File* : `%s`  
-]], manifest.name, manifest.description, manifest.author, manifest.version, manifest.id, manifest.file))
+
+]], manifest.name, manifest.description, manifest.author, manifest.version, manifest.id, manifest.file)
+    if manifest.source then info = info .. string.format("*Source* : `[%s](%s)`  \n", manifest.source:match("^https?://([^/]+)", manifest.source)) end
+    self.md:SetMarkdown(info)
 
     if manifest.enabled then
         self.toggle:SetText("Disable")
