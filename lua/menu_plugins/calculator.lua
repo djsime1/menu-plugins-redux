@@ -7,7 +7,6 @@ local MANIFEST = {
 }
 
 menup(MANIFEST)
-
 menup.drawer.add(MANIFEST.id, "Calculator", function() end, "icon16/calculator.png")
 
 return function()

@@ -11,14 +11,18 @@ end
 
 function menup.drawer.open(x, y)
     local dm = DermaMenu()
+
     for k, v in SortedPairs(menup.drawer.buttons) do
         local btn = dm:AddOption(v[1], v[2])
+
         if v[3] then
             btn:SetIcon(v[3])
         end
     end
+
     dm:AddSpacer()
     dm:AddOption("Manage plugins", ShowPluginsWindow):SetIcon("icon16/plugin_edit.png")
+
     if x and y then
         dm:Open(x, y)
     else

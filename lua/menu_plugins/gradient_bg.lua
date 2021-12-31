@@ -27,6 +27,7 @@ local grad = Material("gui/gradient", "nocull smooth")
 local r1, r2, r3, r4 = math.random(0, 359), math.random(0, 359), math.random(0, 359), math.random(0, 359)
 local fade = 1
 OldDrawBackground = DrawBackground
+
 local function reload()
     local fspeed = menup.config.get(MANIFEST.id, "afade", 1)
     local bgtxt = menup.config.get(MANIFEST.id, "btext", "")
@@ -86,7 +87,9 @@ local function reload()
 end
 
 hook.Add("ConfigApply", "GradientBackgroundReload", function(id)
-    if id == MANIFEST.id then reload() end
+    if id == MANIFEST.id then
+        reload()
+    end
 end)
 
 reload()

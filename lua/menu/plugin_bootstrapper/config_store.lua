@@ -107,9 +107,11 @@ function menup.options.getTable()
     local res = dblist("data_legacy.%")
     if not res then return {} end
     local out = {}
+
     for _, v in ipairs(res) do
         out[string.sub(v.key, 13)] = util.JSONToTable(v.value).config
     end
+
     return out
 end
 

@@ -30,7 +30,6 @@ function env.menup(perhaps)
 end
 
 function menup.control.preload(func)
-
     setfenv(func, env)
     pcall(func)
     setfenv(func, _G)
@@ -76,6 +75,7 @@ function menup.control.load(fileorfunc, name)
     end
 
     local temp = menup.control.preload(fileorfunc)
+
     if temp.legacy then
         temp.id = "legacy." .. name
         temp.name = name

@@ -29,33 +29,36 @@ local function apply()
     local onjoin = menup.config.get(MANIFEST.id, "onjoin", 1)
 
     local function alert()
-        if asound then surface.PlaySound(soundfile) end
-        if aflash then system.FlashWindow() end
+        if asound then
+            surface.PlaySound(soundfile)
+        end
+
+        if aflash then
+            system.FlashWindow()
+        end
+
         print("Pling!")
     end
 
     local launchfuncs = {
-        function() -- When menu is loaded
+        function()
             hook.Add("GameContentChanged", "PlingMainMenu", function()
                 hook.Remove("GameContentChanged", "PlingMainMenu")
                 timer.Simple(1, alert)
             end)
-        end,
-        function() -- When workshop is complete
+        end, -- When menu is loaded
+        function()
             hook.Add("WorkshopEnd", "PlingWorkshop", function()
                 if IsInGame() then return end
                 timer.Simple(0, alert)
             end)
-        end,
-        function() end -- Never
+        end, -- When workshop is complete
+        function() end
     }
 
-    local joinfuncs = {
-        
-    }
-
+    -- Never
+    local joinfuncs = {}
     launchfuncs[onlaunch]()
-
 end
 
 apply()

@@ -50,7 +50,6 @@ local cfpnls = {
 
         return root
     end,
-
     int = function(id, key, data)
         local val = menup.config.get(id, key, isnumber(data[3]) and data[3] or 0)
         local root = vgui.Create("DPanel")
@@ -84,7 +83,6 @@ local cfpnls = {
 
         return root
     end,
-
     float = function(id, key, data)
         local val = menup.config.get(id, key, isnumber(data[3]) and data[3] or 0)
         local root = vgui.Create("DPanel")
@@ -111,7 +109,6 @@ local cfpnls = {
 
         return root
     end,
-
     range = function(id, key, data)
         local min, max, default = data[3][1], data[3][2], data[3][3]
         min = (min ~= nil and min or 0)
@@ -138,7 +135,6 @@ local cfpnls = {
 
         return root
     end,
-
     string = function(id, key, data)
         local val = menup.config.get(id, key, isstring(data[3]) and data[3] or "")
         local root = vgui.Create("DPanel")
@@ -165,7 +161,6 @@ local cfpnls = {
 
         return root
     end,
-
     select = function(id, key, data)
         local val = menup.config.get(id, key, isnumber(data[3][1]) and data[3][1] or 1)
         local root = vgui.Create("DPanel")
@@ -271,6 +266,7 @@ function InfoPanel:BuildConfig(manifest)
     apply:SetTall(32)
     apply:SetText("Apply settings")
     apply:SetIcon("icon16/disk.png")
+
     apply.DoClick = function()
         hook.Run("ConfigApply", manifest.id)
     end
@@ -288,7 +284,11 @@ function InfoPanel:Load(manifest)
 *File* : `%s`  
 
 ]], manifest.name, manifest.description, manifest.author, manifest.version, manifest.id, manifest.file)
-    if manifest.source then info = info .. string.format("*Source* : `[%s](%s)`  \n", manifest.source:match("^https?://([^/]+)", manifest.source)) end
+
+    if manifest.source then
+        info = info .. string.format("*Source* : `[%s](%s)`  \n", manifest.source:match("^https?://([^/]+)", manifest.source))
+    end
+
     self.md:SetMarkdown(info)
 
     if manifest.enabled then
