@@ -1,11 +1,13 @@
 _G.menup = {}
-menup.version = "0.1.4" -- used to check for updates
+menup.version = "0.1.5" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
-- Patch error caused when loading a broken plugin.  
-- Update checker now checks for plugin updates too.  
-- Added `menup.control.preload` for developers.  
-- Added new fields to plugins manifest tables. (source & changelog)  
+- Updated the readme.  
+- Added `menup` console command. (Still needs autocomplete)  
+- Improved plugin loading output and fixed a potential error.  
+- The "save" parameter of `menup.control.enable/disable` now actually saves.  
+- Removed the useless calculator plugin.  
+- Update checker now shows notifications.  
 ]]
 
 local splash = [[

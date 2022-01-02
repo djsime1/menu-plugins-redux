@@ -149,8 +149,10 @@ hook.Add("MenuVGUIReady", MANIFEST.id, function()
     local branch = ({"main", "dev"})[menup.config.get(MANIFEST.id, "channel", 1)]
 
     local url = string.format("https://raw.githubusercontent.com/djsime1/menu-plugins-redux/%s/lua/menu/menu_plugins.lua", branch)
-    local count, expecting = 0, 0
+    local count, expecting = 0, 1
     local updates = {} -- {name, current, new, source, changelog}
+    RealFrameTime = FrameTime -- RFT doesn't exist in menu realm and is needed for notifications
+    notification.AddProgress(MANIFEST.id, "Checking for updates...", 0)
 
     local function cb(success, data)
         if success then
@@ -158,9 +160,17 @@ hook.Add("MenuVGUIReady", MANIFEST.id, function()
         end
 
         count = count + 1
+        notification.AddProgress(MANIFEST.id, "Checking for updates...", count / expecting)
 
-        if count >= expecting and #updates != 0 then
-            popup(updates)
+        if count >= expecting then
+            notification.Kill(MANIFEST.id)
+
+            if #updates ~= 0 then
+                notification.AddLegacy("There are " .. #updates .. " updates available!", NOTIFY_UNDO, 5)
+                popup(updates)
+            else
+                notification.AddLegacy("You are all up to date.", NOTIFY_GENERIC, 5)
+            end
         end
     end
 
