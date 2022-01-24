@@ -6,7 +6,7 @@ local CONFIG = {
         "Notify on launch...", "select", {"When menu is loaded", "When workshop is complete", "Never"}
     },
     onjoin = {
-        "Notify on join... (Doesn't work yet)", "select", {"When spawned in server", "When lua started", "When FPS stabilizes", "Never"}
+        "Notify on join... ", "select", {"When spawned in server", "When lua started", "When FPS stabilizes", "Never"}
     },
 }
 
@@ -40,25 +40,82 @@ local function apply()
         print("Pling!")
     end
 
+    hook.Remove("MenuStart", MANIFEST.id)
+    hook.Remove("WorkshopEnd", MANIFEST.id)
+    hook.Remove("CaptureVideo", MANIFEST.id)
+    timer.Remove(MANIFEST.id)
+
     local launchfuncs = {
-        function()
-            hook.Add("GameContentChanged", "PlingMainMenu", function()
-                hook.Remove("GameContentChanged", "PlingMainMenu")
+        function() -- When menu is loaded
+            hook.Add("MenuStart", MANIFEST.id, function()
+                alert()
+            end)
+        end,
+        function() -- When workshop is complete
+            hook.Add("WorkshopEnd", MANIFEST.id, function()
+                if IsInGame() then return end
                 timer.Simple(1, alert)
             end)
-        end, -- When menu is loaded
-        function()
-            hook.Add("WorkshopEnd", "PlingWorkshop", function()
-                if IsInGame() then return end
-                timer.Simple(0, alert)
-            end)
-        end, -- When workshop is complete
-        function() end
+        end,
+        function() end -- Never
     }
 
-    -- Never
-    local joinfuncs = {}
+    local joinfuncs = {
+        function() -- When spawned in server
+            local wasingame = false
+
+            timer.Create(MANIFEST.id, 1, 0, function()
+                if IsInGame() == true and wasingame == false then
+                    alert()
+                end
+                wasingame = IsInGame()
+            end)
+        end,
+        function() -- When lua started
+            local loadstatus = ""
+
+            hook.Add("CaptureVideo", MANIFEST.id, function()
+                if GetLoadStatus() == "Lua Started!" and loadstatus ~= "Lua Started!" then -- TODO: Localize
+                    alert()
+                end
+
+                loadstatus = GetLoadStatus()
+            end)
+        end,
+        function() -- When FPS stabilizes
+            local wasingame = false
+
+            timer.Create(MANIFEST.id, 1, 0, function()
+                if IsInGame() == true and wasingame == false then
+                    local fps = {}
+
+                    hook.Add("CaptureVideo", MANIFEST.id, function()
+                        if not IsInGame() then return end
+                        local sum = 0
+                        table.insert(fps, 1, 1 / FrameTime())
+                        fps[30] = nil
+
+                        for i = 1, #fps do
+                            sum = sum + fps[i]
+                        end
+
+                        if #fps < 20 then return end
+
+                        if math.abs((sum / 30) - (1 / FrameTime())) <= 5 then
+                            hook.Remove("CaptureVideo", MANIFEST.id)
+                            alert()
+                        end
+                    end)
+                end
+
+                wasingame = IsInGame()
+            end)
+        end,
+        function() end -- Never
+    }
+
     launchfuncs[onlaunch]()
+    joinfuncs[onjoin]()
 end
 
 apply()
@@ -71,6 +128,8 @@ hook.Add("ConfigApply", "GradientBackgroundReload", function(id)
 end)
 
 return function()
-    hook.Remove("GameContentChanged", "PlingMainMenu")
-    hook.Remove("WorkshopEnd", "PlingWorkshop")
+    hook.Remove("MenuStart", MANIFEST.id)
+    hook.Remove("WorkshopEnd", MANIFEST.id)
+    hook.Remove("CaptureVideo", MANIFEST.id)
+    timer.Remove(MANIFEST.id)
 end

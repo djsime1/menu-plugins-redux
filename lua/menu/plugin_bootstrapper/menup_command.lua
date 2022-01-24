@@ -95,7 +95,6 @@ local function menup_load(stuff)
     elseif menup.plugins[stuff] then
         local p = menup.plugins[stuff]
         if not p.file then MsgC(Color(255, 234, 0), "The plugin has no file assicaited with it.\n") return end
-        print(p.file)
         menup_load({"bazinga", p.file})
     else
         MsgC(Color(255, 234, 0), "Could not find a file or plugin ID with that query.\n")
