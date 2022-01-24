@@ -24,7 +24,6 @@ function PANEL:OnDocumentReady()
     --         print("Unknown hash: " .. hash)
     --     end
     -- end)
-
     self:AddFunction("lua", "Open", function(url)
         gui.OpenURL(url)
     end)
@@ -43,6 +42,5 @@ end
 -- function PANEL:AddHash(title, callback)
 --     self.hashes[title] = callback
 -- end
-
 vgui.Register("MarkdownPanel", PANEL, "DHTML")
 menup.markdown = markdown

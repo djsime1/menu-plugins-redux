@@ -13,8 +13,8 @@
   <li>📁 A nifty drawer to quickly access plugin functionality.</li>
   <li>🧩 Some sample plugins to get you started.</li>
   <li>✅ Fully compatible with legacy menu plugins!</li>
+  <li>🤖 Automatic update checking & notification.</li>
   <li>🔎 Search & install plugins without leaving the game. 🔸</li>
-  <li>🤖 Automatic update checking & notification. 🔸</li>
   <i>(🔸 Not yet implemented/work in progress!)</i>
 </ul>
 <hr>

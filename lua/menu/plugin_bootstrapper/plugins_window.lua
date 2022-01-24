@@ -40,13 +40,12 @@ function PANEL:Init()
     self.find = find
     local about = self:Add("MarkdownPanel")
     tabs:AddSheet("About/Credits", about, "icon16/information.png")
-    about:SetMarkdown([[
-# Menu Plugins *Redux*
-
+    about:SetMarkdown("# Menu Plugins *Redux*\nVersion " .. menup.version .. [[. 
 ## About
 This modification was written to enable the usage of menu plugins.  
 They're like addons, but for the main/pause menu.  
 The Redux version extends the existing Menu Plugins framework while retaining compatibility with existing scripts.  
+Want to make your own menu plugin? Check out [the wiki](https://github.com/djsime1/menu-plugins-redux/wiki).
 
 ## Credits
 - *[djsime1](https://github.com/djsime1)* : Lead author of this mess.  

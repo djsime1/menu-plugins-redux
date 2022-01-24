@@ -44,7 +44,7 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         cb.OnChange = function(pnl, newval)
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -77,7 +77,7 @@ local cfpnls = {
                 wang:SetText(tostring(newval))
             end
 
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -103,7 +103,7 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         wang.OnValueChanged = function(pnl, newval)
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -129,7 +129,7 @@ local cfpnls = {
         slider:SetDark(true)
 
         slider.OnValueChanged = function(pnl, newval)
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -154,8 +154,9 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         tbox.OnLoseFocus = function(pnl)
-            -- hook.Run("UserConfigChange", id, key, pnl:GetText(), val)
-            menup.config.set(id, key, pnl:GetText())
+            local newval = pnl:GetText()
+            hook.Run("UserConfigChange", id, key, newval, val)
+            menup.config.set(id, key, newval)
         end
 
         return root
@@ -188,7 +189,7 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         combo.OnSelect = function(pnl, newval)
-            -- hook.Run("UserConfigChange", id, key, newval, val)
+            hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
         end
 
@@ -265,6 +266,7 @@ function InfoPanel:BuildConfig(manifest)
     apply:SetTall(32)
     apply:SetText("Apply settings")
     apply:SetIcon("icon16/disk.png")
+
     apply.DoClick = function()
         hook.Run("ConfigApply", manifest.id)
     end
@@ -272,7 +274,7 @@ end
 
 function InfoPanel:Load(manifest)
     self.manifest = manifest
-    self.md:SetMarkdown(string.format([[
+    local info = string.format([[
 ## %s
 %s  
 ## 
@@ -280,7 +282,13 @@ function InfoPanel:Load(manifest)
 *Version* : %s  
 *ID* : `%s`  
 *File* : `%s`  
-]], manifest.name, manifest.description, manifest.author, manifest.version, manifest.id, manifest.file))
+]], manifest.name, manifest.description, manifest.author, manifest.version, manifest.id, manifest.file)
+
+    if manifest.source then
+        info = info .. string.format("*Source* : [%s](%s)  \n", manifest.source:match("^https?://([^/]+)"), manifest.source)
+    end
+
+    self.md:SetMarkdown(info)
 
     if manifest.enabled then
         self.toggle:SetText("Disable")
