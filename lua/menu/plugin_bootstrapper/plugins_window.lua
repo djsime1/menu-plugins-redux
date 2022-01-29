@@ -81,4 +81,4 @@ function ShowPluginsWindow()
     PluginsWindow:MakePopup()
 end
 
-concommand.Add("menu_plugins", ShowPluginsWindow)
+-- concommand.Add("menu_plugins", ShowPluginsWindow)

@@ -60,8 +60,9 @@
 <details>
   <summary>👍 Launch the game!</summary>
   If everything was successful, then MPR should now be installed and active!<br>
-  Assuming you're on the x86-64 branch, there should be a new button on the main menu toolbar named "Plugins."<br>
-  There should also be a fancy banner in your console. Running the command <code>menu_plugins</code> will open a GUI.<br>
+  Assuming you're on the x86-64 branch, there should be a new button on the default menu toolbar named "Plugins."<br>
+  There should also be a fancy banner in your console. Running the command <code>menup gui</code> will open a GUI.<br>
+  More commands can be found by running the <code>menup</code> command.
 </details>
 <hr>
 <h2>👨‍💻 Development & Contributing</h2>

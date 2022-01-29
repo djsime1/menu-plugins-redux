@@ -48,4 +48,4 @@ hook.Add("DrawOverlay", "menup_button", function()
     end
 end)
 
-concommand.Add("menup_drawer", menup.drawer.open)
+-- concommand.Add("menup_drawer", menup.drawer.open)

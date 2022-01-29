@@ -60,4 +60,4 @@ function ReloadMenu()
     include("menu/menu.lua")
 end
 
-concommand.Add("menu_reload", ReloadMenu)
+-- concommand.Add("menu_reload", ReloadMenu)

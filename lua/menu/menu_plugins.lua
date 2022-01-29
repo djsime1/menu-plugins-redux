@@ -2,9 +2,10 @@ _G.menup = {}
 menup.version = "0.1.6" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
-- Remove debug print form `menup load` command.   
 - Added `api` and `dependencies` parameters to manifests.  
 - Added on join functionality to Pling.  
+- Remove debug print form `menup load` command.  
+- Removed menu_reload, menu_plugins, and menup_drawer commands.  
 *Previous changelog:*  
 - Updated the readme.  
 - Added `menup` console command. (Still needs autocomplete)  
