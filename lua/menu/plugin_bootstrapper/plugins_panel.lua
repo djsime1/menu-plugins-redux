@@ -162,7 +162,7 @@ local cfpnls = {
         return root
     end,
     select = function(id, key, data)
-        local val = menup.config.get(id, key, isnumber(data[3][1]) and data[3][1] or 1)
+        local val = menup.config.get(id, key, 1)
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
@@ -191,6 +191,222 @@ local cfpnls = {
         combo.OnSelect = function(pnl, newval)
             hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
+        end
+
+        return root
+    end,
+    color = function(id, key, data)
+        local val = menup.config.get(id, key, istable(data[3]) and Color(data[3][1], data[3][2], data[3][3], data[3][4]) or Color(255, 0, 0, 255))
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local preview = root:Add("DColorButton")
+
+        if isstring(data[4]) then
+            root:SetTooltip(data[4])
+        end
+
+        preview:Dock(RIGHT)
+        preview:SetWide(48)
+        preview:SetColor(val, true)
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+        local picker
+        preview.DoClick = function()
+            if IsValid(picker) then picker:Remove() end
+            picker = vgui.Create("DPanel")
+            picker:SetSize(272, 296)
+            local sx, sy = preview:LocalToScreen(24, 0)
+            picker:SetPos(sx - 128, sy - 296)
+            picker.Paint = function(s, w, h)
+                picker:GetSkin().tex.Tab_Control(0, 0, w, h)
+            end
+
+            local cc = picker:Add("DColorMixer")
+            cc:SetColor(val)
+            timer.Simple(0, function() cc:SetColor(val) end) -- why do i have to do this?
+            cc:SetPos(8, 8)
+            cc:SetSize(256, 250)
+            local detail = cc.WangsPanel:Add("DColorButton")
+            detail:Dock(FILL)
+            detail:DockMargin(0, 4, 0, 0)
+            detail:SetColor(val)
+            cc.ValueChanged = function(_, newval)
+                detail:SetColor(Color(newval.r, newval.g, newval.b, newval.a))
+            end
+
+            local ok = picker:Add("DButton")
+            ok:SetPos(94, 264)
+            ok:SetSize(170, 24)
+            ok:SetText("Save")
+            ok:SetIcon("icon16/tick.png")
+            ok.DoClick = function()
+                local newval = cc:GetColor()
+                preview:SetColor(newval, true)
+                hook.Run("UserConfigChange", id, key, newval, val)
+                menup.config.set(id, key, newval)
+                picker:Remove()
+            end
+
+            local cancel = picker:Add("DButton")
+            cancel:SetPos(8, 264)
+            cancel:SetSize(86, 24)
+            cancel:SetText("Cancel")
+            cancel:SetIcon("icon16/cross.png")
+            cancel.DoClick = function()
+                picker:Remove()
+            end
+
+            picker:MakePopup()
+        end
+
+        return root
+    end,
+    keybind = function(id, key, data)
+        if vgui.GetControlTable("DBinder") == nil then
+            include("vgui/dbinder.lua") -- not included in menu realm by default
+        end
+        local val = menup.config.get(id, key, isnumber(data[3]) and data[3] or 0)
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local binder = root:Add("DBinder")
+
+        if isstring(data[4]) then
+            root:SetTooltip(data[4])
+        end
+
+        binder:Dock(RIGHT)
+        binder:SetWide(96)
+        binder:SetValue(val)
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+
+        binder.OnChange = function(pnl, newval)
+            hook.Run("UserConfigChange", id, key, newval, val)
+            menup.config.set(id, key, newval)
+        end
+
+        return root
+    end,
+    file = function(id, key, data)
+        if vgui.GetControlTable("DFileBrowser") == nil then
+            include("vgui/dfilebrowser.lua") -- not included in menu realm by default
+            include("vgui/dhorizontaldivider.lua")
+        end
+        -- base, match, default
+        local val = menup.config.get(id, key, isstring(data[3][3]) and data[3][3] or nil)
+        local base = isstring(data[3][1]) and data[3][1] or ""
+        local match = isstring(data[3][2]) and data[3][2] or "*"
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local preview = root:Add("DButton")
+
+        if isstring(data[4]) then
+            root:SetTooltip(data[4])
+        end
+
+        root:SetTall(48)
+        preview:Dock(BOTTOM)
+        preview:SetText(isstring(val) and val or "No file selected")
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+
+        local frame
+        preview.DoClick = function()
+            if IsValid(frame) then frame:Remove() end
+            frame = vgui.Create("DFrame")
+            frame:SetSize(512, 384)
+            frame:Center()
+            frame:SetTitle("Select file")
+            frame:SetSizable(true)
+            frame:SetScreenLock(true)
+            frame:NoClipping(true)
+            local bgcol = Color(0, 0, 0, 128)
+            local message = "Double-click to select"
+            frame.PaintOver = function(s, w, h)
+                draw.RoundedBoxEx(16, 8, h, w - 16, 28, bgcol, false, false, true, true)
+                surface.SetFont("Trebuchet24")
+                local tw, th = surface.GetTextSize(message)
+                surface.SetTextColor(color_white) -- where does this even come from lmao
+                surface.SetTextPos(w / 2 - tw / 2, h)
+                surface.DrawText(message)
+            end
+
+            local browser = frame:Add("DFileBrowser")
+            browser:Dock(FILL)
+            browser:SetOpen(true)
+            browser:SetPath("GAME")
+            browser:SetBaseFolder(base)
+            browser:SetCurrentFolder(base)
+            browser:SetSearch(match)
+            browser.OnDoubleClick = function(_, newval)
+                newval = newval:sub(#base + 2)
+                preview:SetText(newval)
+                hook.Run("UserConfigChange", id, key, newval, val)
+                menup.config.set(id, key, newval)
+                frame:Close()
+            end
+
+            frame:MakePopup()
+        end
+
+        return root
+    end,
+    stack = function(id, key, data)
+        local val = menup.config.get(id, key, data[3])
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local combo = root:Add("DComboBox")
+
+        if isstring(data[4]) then
+            root:SetTooltip(data[4])
+        end
+
+        root:SetTall(48)
+        combo:Dock(BOTTOM)
+        combo:SetSortItems(false)
+        -- function combo.DropButton.GetExpanded(s)
+        --     return combo:IsMenuOpen()
+        -- end
+        -- Derma_Hook(combo.DropButton, "Paint", "Paint", "ExpandButton")
+
+        local enabled = 0
+        local total = 0
+
+        for k, v in SortedPairs(val) do
+            combo:AddChoice(k)
+            if v then enabled = enabled + 1 end
+            total = total + 1
+        end
+
+        combo:SetText(enabled .. "/" .. total .. " selected")
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+
+        combo.OnMenuOpened = function(_, pnl)
+            enabled = 0
+            for i = 1, pnl:ChildCount() do
+                local child = pnl:GetChild(i)
+                local check = val[child:GetText()]
+                if check then
+                    child:SetChecked(true)
+                    enabled = enabled + 1
+                end
+            end
+            combo:SetText(enabled .. "/" .. total .. " selected")
+        end
+
+        combo.OnSelect = function(pnl, _, txt)
+            local oldval = table.Copy(val)
+            val[txt] = not val[txt]
+            timer.Simple(0, function()
+                combo:OpenMenu()
+            end)
+            hook.Run("UserConfigChange", id, key, val, oldval)
+            menup.config.set(id, key, val)
         end
 
         return root

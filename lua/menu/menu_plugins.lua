@@ -4,6 +4,8 @@ menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/mai
 menup.changelog = [[
 - Added `api` and `dependencies` parameters to manifests.  
 - Added on join functionality to Pling.  
+- Added Color, Keybind, File, and Stack config types.  
+- Changed Pling sound option to file type.  
 - Remove debug print form `menup load` command.  
 - Removed menu_reload, menu_plugins, and menup_drawer commands.  
 *Previous changelog:*  

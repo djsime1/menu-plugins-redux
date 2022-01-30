@@ -1,5 +1,5 @@
 local CONFIG = {
-    sound = {"Sound path", "string", "garrysmod/content_downloaded.wav"},
+    sound = {"Sound path", "file", {"sound", "*", "garrysmod/content_downloaded.wav"}},
     asound = {"Alert with sound", "bool", true},
     aflash = {"Alert with taskbar flash", "bool", true},
     onlaunch = {
@@ -15,7 +15,7 @@ local MANIFEST = {
     author = "djsime1",
     name = "Pling!",
     description = "Allows you to be notified when GMod finishes loading, or when you fully load into a server.",
-    version = "1.0",
+    version = "1.2",
     config = CONFIG
 }
 
