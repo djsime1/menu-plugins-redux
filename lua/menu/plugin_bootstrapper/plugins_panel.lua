@@ -1,4 +1,5 @@
 local InfoPanel = table.Copy(vgui.GetControlTable("DPanel"))
+local color_gray = Color(222, 222, 222)
 
 local function LegacyConfig(v)
     local dm = DermaMenu()
@@ -388,6 +389,7 @@ local cfpnls = {
 
         combo.OnMenuOpened = function(_, pnl)
             enabled = 0
+            pnl:SetDrawColumn(true)
             for i = 1, pnl:ChildCount() do
                 local child = pnl:GetChild(i)
                 local check = val[child:GetText()]
@@ -407,6 +409,230 @@ local cfpnls = {
             end)
             hook.Run("UserConfigChange", id, key, val, oldval)
             menup.config.set(id, key, val)
+        end
+
+        return root
+    end,
+    sort = function(id, key, data) -- this was so painful
+        local val = menup.config.get(id, key, data[3])
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local combo = root:Add("DComboBox")
+
+        if isstring(data[4]) then
+            root:SetTooltip(data[4])
+        end
+
+        root:SetTall(48)
+        combo:Dock(BOTTOM)
+        combo:SetSortItems(false)
+        function combo.DropButton.GetExpanded(s)
+            return combo:IsMenuOpen()
+        end
+        Derma_Hook(combo.DropButton, "Paint", "Paint", "ExpandButton")
+
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+        combo:SetText(table.concat(val, ", "))
+
+        combo.DoClick = function()
+            if combo.Menu then combo.Menu:Remove() end
+            val = menup.config.get(id, key, data[3])
+            local dm = DermaMenu(false, combo)
+            combo.Menu = dm
+            local ll = dm:Add("DListLayout")
+            ll:MakeDroppable("menup." .. id .. "." .. key)
+            ll.children = {}
+            dm:AddPanel(ll)
+            for k, v in ipairs(val) do
+                local pan = ll:Add("DPanel")
+                local txt = pan:Add("DLabel")
+                pan.pos = k
+                pan.val = v
+                ll.children[k] = pan
+                pan.GetChecked = function() end
+                pan.Paint = function(_, w, h)
+                    draw.RoundedBox(0, 1, 0, 22, 22, color_gray)
+                    draw.RoundedBox(0, 22, 0, w - 23, 22, (pan.pos % 2 == 0) and color_gray or color_white)
+                    derma.SkinHook( "Paint", "MenuOption", pan, w, h )
+                    if pan:IsHovered() and not dragndrop.IsDragging() then
+                        pan:GetSkin().tex.Input.Slider.V.Normal(3, 3, 15, 16)
+                    else
+                        surface.SetFont("DermaDefaultBold")
+                        surface.SetTextColor(Color(0, 0, 0))
+                        surface.SetTextPos(4, 4)
+                        surface.DrawText(pan.pos .. ":")
+                    end
+                end
+                pan:Dock(TOP)
+                pan:SetTall(22)
+                txt:Dock(RIGHT)
+                txt:SetWide(combo:GetWide() - 28)
+                txt:SetDark(true)
+                txt:SetText(v)
+            end
+
+            ll.OnModified = function(_, refresh)
+                timer.Simple(0, function()
+                    if not IsValid(ll) then return end
+                    local newval = {}
+                    for k,v in ipairs(ll.children) do
+                        if not IsValid(v) then continue end
+                        local pan = v
+                        local pos = pan:GetY() / 22 + 1
+                        pan.pos = pos
+                        newval[pos] = pan.val
+                    end
+                    combo:SetText(table.concat(newval, ", "))
+                    hook.Run("UserConfigChange", id, key, newval, val)
+                    menup.config.set(id, key, newval)
+                    if refresh then combo:DoClick():MakePopup() end
+                end)
+            end
+
+            local x, y = combo:LocalToScreen( 0, combo:GetTall() )
+            dm:SetMinimumWidth(combo:GetWide())
+            dm:Open( x, y, false, combo )
+        end
+
+        return root
+    end,
+    list = function(id, key, data) -- this was even more painful
+        local val = menup.config.get(id, key, data[3])
+        local root = vgui.Create("DPanel")
+        local label = root:Add("DLabel")
+        local combo = root:Add("DComboBox")
+
+        if isstring(data[4]) then
+            root:SetTooltip(data[4])
+        end
+
+        root:SetTall(48)
+        combo:Dock(BOTTOM)
+        combo:SetSortItems(false)
+        function combo.DropButton.GetExpanded(s)
+            return combo:IsMenuOpen()
+        end
+        Derma_Hook(combo.DropButton, "Paint", "Paint", "ExpandButton")
+
+        label:Dock(FILL)
+        label:SetText(data[1])
+        label:SetTextColor(Color(0, 0, 0))
+        combo:SetText(table.concat(val, ", "))
+
+        combo.DoClick = function()
+            if combo.Menu then combo.Menu:Remove() end
+            val = menup.config.get(id, key, data[3])
+            local dm = DermaMenu(false, combo)
+            combo.Menu = dm
+            local add = dm:Add("DButton")
+            local ll = dm:Add("DListLayout")
+            add:Dock(TOP)
+            add:SetTall(22)
+            add:SetText("Add")
+            add:SetIcon("icon16/add.png")
+            add.DoClick = function()
+                local newval = table.Copy(val)
+                table.insert(newval, 1, "")
+                menup.config.set(id, key, newval)
+                hook.Run("UserConfigChange", id, key, newval, val)
+                local newdm = combo:DoClick()
+                newdm.first:RequestFocus()
+            end
+            ll:MakeDroppable("menup." .. id .. "." .. key)
+            ll.children = {}
+            dm:AddPanel(ll)
+            for k, v in ipairs(val) do
+                local pan = ll:Add("DPanel")
+                local ep = pan:Add("EditablePanel")
+                local del = pan:Add("DButton")
+                local txt = ep:Add("DTextEntry")
+                if k == 1 then
+                    dm.first = txt
+                end
+                pan.pos = k
+                pan.val = v
+                ll.children[k] = pan
+                pan.GetChecked = function() end
+                pan.Paint = function(_, w, h)
+                    draw.RoundedBox(0, 1, 0, 22, h, color_gray)
+                    draw.RoundedBox(0, 22, 0, w - 23, h, (pan.pos % 2 == 0) and color_gray or color_white)
+                    if (pan:IsHovered() or pan:IsChildHovered() or txt:IsEditing()) and not dragndrop.IsDragging() then
+                        pan:GetSkin().tex.Input.Slider.V.Hover(3, 3, 15, 16)
+                        txt:SetPaintBackground(true)
+                        del:SetVisible(true)
+                    else
+                        surface.SetFont("DermaDefaultBold")
+                        surface.SetTextColor(Color(0, 0, 0))
+                        surface.SetTextPos(4, 4)
+                        surface.DrawText(pan.pos .. ":")
+                        txt:SetPaintBackground(false)
+                        del:SetVisible(false)
+                    end
+                end
+                del.DoClick = function()
+                    pan:Remove()
+                    ll:OnModified()
+                end
+                txt.OnGetFocus = function()
+                    txt:MakePopup()
+                    txt:SetDrawOnTop(true)
+                    txt:SetPos(pan:LocalToScreen(22, 0))
+                end
+                txt.OnLoseFocus = function()
+                    -- focus isnt automatically removed and the panel bugs out
+                    -- this is the nuclear option :)
+                    pan.val = txt:GetValue()
+                    ll:OnModified(true)
+                end
+                txt.OnKeyCode = function(_, kc)
+                    if kc == KEY_ENTER or kc == KEY_TAB then
+                        txt:OnLoseFocus()
+                    end
+                end
+                pan:Dock(TOP)
+                pan:SetTall(22)
+                del:SetPos(combo:GetWide() - 22, 0)
+                del:SetSize(22, 22)
+                del:SetText("")
+                del:SetIcon("icon16/cancel.png")
+                del:Hide()
+                ep:SetPos(22, 0)
+                ep:SetSize(combo:GetWide() - 43, 22)
+                ep:SetPaintBackgroundEnabled(false)
+                txt:SetPos(0, 0)
+                txt:SetSize(ep:GetSize())
+                txt:SetText(pan.val)
+                txt:SetPlaceholderText("(Empty)")
+                txt:SetPaintBackground(false)
+                txt:SetEnterAllowed(true)
+                txt:SetMultiline(false)
+                pan:InvalidateLayout(false)
+            end
+
+            ll.OnModified = function(_, refresh)
+                timer.Simple(0, function()
+                    if not IsValid(ll) then return end
+                    local newval = {}
+                    for k,v in ipairs(ll.children) do
+                        if not IsValid(v) then continue end
+                        local pan = v
+                        local pos = pan:GetY() / 22 + 1
+                        pan.pos = pos
+                        newval[pos] = pan.val
+                    end
+                    combo:SetText(table.concat(newval, ", "))
+                    hook.Run("UserConfigChange", id, key, newval, val)
+                    menup.config.set(id, key, newval)
+                    if refresh then combo:DoClick():MakePopup() end
+                end)
+            end
+
+            local x, y = combo:LocalToScreen( 0, combo:GetTall() )
+            dm:SetMinimumWidth(combo:GetWide())
+            dm:Open( x, y, false, combo )
+            return dm
         end
 
         return root
