@@ -32,9 +32,9 @@ end
 
 hook.Add("DrawOverlay", "menup_button", function()
     hook.Remove("DrawOverlay", "menup_button")
-    hook.Run("MenuVGUIReady")
+    pcall(hook.Run, "MenuVGUIReady")
 
-    if pnlMainMenu and pnlMainMenu.HTML and vgui.GetControlTable("MainMenuPanel") then
+    if IsValid(pnlMainMenu) and IsValid(pnlMainMenu.HTML) and vgui.GetControlTable("MainMenuPanel") then
         print("Pretty sure this is the default menu, injecting button!")
         pnlMainMenu.HTML:Call([[
         var navright = document.getElementById("NavBar").getElementsByClassName("right")[0];

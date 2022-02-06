@@ -2,6 +2,7 @@
 include( "mount/mount.lua" )
 include( "getmaps.lua" )
 include( "loading.lua" )
+include( "menu_plugins.lua" )
 include( "mainmenu.lua" )
 include( "video.lua" )
 include( "demo_to_video.lua" )
@@ -15,5 +16,3 @@ include( "problems/problems.lua" )
 
 include( "motionsensor.lua" )
 include( "util.lua" )
-
-include( "menu_plugins.lua" )

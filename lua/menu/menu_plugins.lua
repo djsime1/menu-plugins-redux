@@ -1,12 +1,16 @@
 _G.menup = {}
-menup.version = "0.1.6" -- used to check for updates
+menup.version = "0.2.0" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
 - Added `api` and `dependencies` parameters to manifests.  
 - Added on join functionality to Pling.  
-- Added Color, Keybind, File, and Stack config types.  
+- Added Color, Keybind, File, Stack, Sort, and List config types.  
+- Added in-game color option to Background Customizer.  
+- Fixed an potential issue with the toolbar button.  
 - Changed Pling sound option to file type.  
-- Remove debug print form `menup load` command.  
+- Changed Background Customizer to allow multiple background texts.  
+- Changed plugin loading to occur BEFORE menu is loaded.  
+- Removed debug print form `menup load` command.  
 - Removed menu_reload, menu_plugins, and menup_drawer commands.  
 *Previous changelog:*  
 - Updated the readme.  

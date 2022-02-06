@@ -33,10 +33,6 @@ local cfpnls = {
         local label = root:Add("DLabel")
         local cb = root:Add("DCheckBox")
 
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
-
         cb:Dock(RIGHT)
         cb:SetWide(15)
         cb:SetChecked(val)
@@ -56,10 +52,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local wang = root:Add("DNumberWang")
-
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
 
         wang:Dock(RIGHT)
         wang:SetWide(96)
@@ -90,10 +82,6 @@ local cfpnls = {
         local label = root:Add("DLabel")
         local wang = root:Add("DNumberWang")
 
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
-
         wang:Dock(RIGHT)
         wang:SetWide(96)
         wang:SetMin(-math.huge)
@@ -118,10 +106,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local slider = root:Add("DNumSlider")
 
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
-
         slider:Dock(FILL)
         slider:SetDecimals(3)
         slider:SetMinMax(min, max)
@@ -141,10 +125,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local tbox = root:Add("DTextEntry")
-
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
 
         root:SetTall(48)
         tbox:Dock(BOTTOM)
@@ -167,10 +147,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
-
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
 
         root:SetTall(48)
         combo:Dock(BOTTOM)
@@ -197,14 +173,10 @@ local cfpnls = {
         return root
     end,
     color = function(id, key, data)
-        local val = menup.config.get(id, key, istable(data[3]) and Color(data[3][1], data[3][2], data[3][3], data[3][4]) or Color(255, 0, 0, 255))
+        local val = menup.config.get(id, key, istable(data[3]) and Color(data[3][1], data[3][2], data[3][3], data[3][4] or 255) or Color(255, 255, 255, 255))
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local preview = root:Add("DColorButton")
-
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
 
         preview:Dock(RIGHT)
         preview:SetWide(48)
@@ -213,25 +185,36 @@ local cfpnls = {
         label:SetText(data[1])
         label:SetTextColor(Color(0, 0, 0))
         local picker
+
         preview.DoClick = function()
-            if IsValid(picker) then picker:Remove() end
+            if IsValid(picker) then
+                picker:Remove()
+            end
+
             picker = vgui.Create("DPanel")
             picker:SetSize(272, 296)
             local sx, sy = preview:LocalToScreen(24, 0)
             picker:SetPos(sx - 128, sy - 296)
+
             picker.Paint = function(s, w, h)
                 picker:GetSkin().tex.Tab_Control(0, 0, w, h)
             end
 
             local cc = picker:Add("DColorMixer")
             cc:SetColor(val)
-            timer.Simple(0, function() cc:SetColor(val) end) -- why do i have to do this?
+
+            -- why do i have to do this?
+            timer.Simple(0, function()
+                cc:SetColor(val)
+            end)
+
             cc:SetPos(8, 8)
             cc:SetSize(256, 250)
             local detail = cc.WangsPanel:Add("DColorButton")
             detail:Dock(FILL)
             detail:DockMargin(0, 4, 0, 0)
             detail:SetColor(val)
+
             cc.ValueChanged = function(_, newval)
                 detail:SetColor(Color(newval.r, newval.g, newval.b, newval.a))
             end
@@ -241,6 +224,7 @@ local cfpnls = {
             ok:SetSize(170, 24)
             ok:SetText("Save")
             ok:SetIcon("icon16/tick.png")
+
             ok.DoClick = function()
                 local newval = cc:GetColor()
                 preview:SetColor(newval, true)
@@ -254,6 +238,7 @@ local cfpnls = {
             cancel:SetSize(86, 24)
             cancel:SetText("Cancel")
             cancel:SetIcon("icon16/cross.png")
+
             cancel.DoClick = function()
                 picker:Remove()
             end
@@ -267,14 +252,11 @@ local cfpnls = {
         if vgui.GetControlTable("DBinder") == nil then
             include("vgui/dbinder.lua") -- not included in menu realm by default
         end
+
         local val = menup.config.get(id, key, isnumber(data[3]) and data[3] or 0)
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local binder = root:Add("DBinder")
-
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
 
         binder:Dock(RIGHT)
         binder:SetWide(96)
@@ -295,6 +277,7 @@ local cfpnls = {
             include("vgui/dfilebrowser.lua") -- not included in menu realm by default
             include("vgui/dhorizontaldivider.lua")
         end
+
         -- base, match, default
         local val = menup.config.get(id, key, isstring(data[3][3]) and data[3][3] or nil)
         local base = isstring(data[3][1]) and data[3][1] or ""
@@ -303,20 +286,19 @@ local cfpnls = {
         local label = root:Add("DLabel")
         local preview = root:Add("DButton")
 
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
-
         root:SetTall(48)
         preview:Dock(BOTTOM)
         preview:SetText(isstring(val) and val or "No file selected")
         label:Dock(FILL)
         label:SetText(data[1])
         label:SetTextColor(Color(0, 0, 0))
-
         local frame
+
         preview.DoClick = function()
-            if IsValid(frame) then frame:Remove() end
+            if IsValid(frame) then
+                frame:Remove()
+            end
+
             frame = vgui.Create("DFrame")
             frame:SetSize(512, 384)
             frame:Center()
@@ -326,6 +308,7 @@ local cfpnls = {
             frame:NoClipping(true)
             local bgcol = Color(0, 0, 0, 128)
             local message = "Double-click to select"
+
             frame.PaintOver = function(s, w, h)
                 draw.RoundedBoxEx(16, 8, h, w - 16, 28, bgcol, false, false, true, true)
                 surface.SetFont("Trebuchet24")
@@ -342,6 +325,7 @@ local cfpnls = {
             browser:SetBaseFolder(base)
             browser:SetCurrentFolder(base)
             browser:SetSearch(match)
+
             browser.OnDoubleClick = function(_, newval)
                 newval = newval:sub(#base + 2)
                 preview:SetText(newval)
@@ -361,10 +345,6 @@ local cfpnls = {
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
 
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
-
         root:SetTall(48)
         combo:Dock(BOTTOM)
         combo:SetSortItems(false)
@@ -372,13 +352,16 @@ local cfpnls = {
         --     return combo:IsMenuOpen()
         -- end
         -- Derma_Hook(combo.DropButton, "Paint", "Paint", "ExpandButton")
-
         local enabled = 0
         local total = 0
 
         for k, v in SortedPairs(val) do
             combo:AddChoice(k)
-            if v then enabled = enabled + 1 end
+
+            if v then
+                enabled = enabled + 1
+            end
+
             total = total + 1
         end
 
@@ -390,54 +373,60 @@ local cfpnls = {
         combo.OnMenuOpened = function(_, pnl)
             enabled = 0
             pnl:SetDrawColumn(true)
+
             for i = 1, pnl:ChildCount() do
                 local child = pnl:GetChild(i)
                 local check = val[child:GetText()]
+
                 if check then
                     child:SetChecked(true)
                     enabled = enabled + 1
                 end
             end
+
             combo:SetText(enabled .. "/" .. total .. " selected")
         end
 
         combo.OnSelect = function(pnl, _, txt)
             local oldval = table.Copy(val)
             val[txt] = not val[txt]
+
             timer.Simple(0, function()
                 combo:OpenMenu()
             end)
+
             hook.Run("UserConfigChange", id, key, val, oldval)
             menup.config.set(id, key, val)
         end
 
         return root
     end,
-    sort = function(id, key, data) -- this was so painful
+    sort = function(id, key, data)
         local val = menup.config.get(id, key, data[3])
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
 
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
-
         root:SetTall(48)
         combo:Dock(BOTTOM)
         combo:SetSortItems(false)
+
         function combo.DropButton.GetExpanded(s)
             return combo:IsMenuOpen()
         end
-        Derma_Hook(combo.DropButton, "Paint", "Paint", "ExpandButton")
 
+        Derma_Hook(combo.DropButton, "Paint", "Paint", "ExpandButton")
         label:Dock(FILL)
         label:SetText(data[1])
         label:SetTextColor(Color(0, 0, 0))
         combo:SetText(table.concat(val, ", "))
 
-        combo.DoClick = function()
-            if combo.Menu then combo.Menu:Remove() end
+        combo.DoClick = function(_, force)
+            if IsValid(combo.Menu) then
+                combo.Menu:Remove()
+                if not force then return end
+            end
+
             val = menup.config.get(id, key, data[3])
             local dm = DermaMenu(false, combo)
             combo.Menu = dm
@@ -445,6 +434,7 @@ local cfpnls = {
             ll:MakeDroppable("menup." .. id .. "." .. key)
             ll.children = {}
             dm:AddPanel(ll)
+
             for k, v in ipairs(val) do
                 local pan = ll:Add("DPanel")
                 local txt = pan:Add("DLabel")
@@ -452,10 +442,12 @@ local cfpnls = {
                 pan.val = v
                 ll.children[k] = pan
                 pan.GetChecked = function() end
+
                 pan.Paint = function(_, w, h)
                     draw.RoundedBox(0, 1, 0, 22, 22, color_gray)
                     draw.RoundedBox(0, 22, 0, w - 23, 22, (pan.pos % 2 == 0) and color_gray or color_white)
-                    derma.SkinHook( "Paint", "MenuOption", pan, w, h )
+                    derma.SkinHook("Paint", "MenuOption", pan, w, h)
+
                     if pan:IsHovered() and not dragndrop.IsDragging() then
                         pan:GetSkin().tex.Input.Slider.V.Normal(3, 3, 15, 16)
                     else
@@ -465,6 +457,7 @@ local cfpnls = {
                         surface.DrawText(pan.pos .. ":")
                     end
                 end
+
                 pan:Dock(TOP)
                 pan:SetTall(22)
                 txt:Dock(RIGHT)
@@ -477,52 +470,59 @@ local cfpnls = {
                 timer.Simple(0, function()
                     if not IsValid(ll) then return end
                     local newval = {}
-                    for k,v in ipairs(ll.children) do
+
+                    for k, v in ipairs(ll.children) do
                         if not IsValid(v) then continue end
                         local pan = v
                         local pos = pan:GetY() / 22 + 1
                         pan.pos = pos
                         newval[pos] = pan.val
                     end
+
                     combo:SetText(table.concat(newval, ", "))
                     hook.Run("UserConfigChange", id, key, newval, val)
                     menup.config.set(id, key, newval)
-                    if refresh then combo:DoClick():MakePopup() end
+
+                    if refresh then
+                        combo:DoClick(true):MakePopup()
+                    end
                 end)
             end
 
-            local x, y = combo:LocalToScreen( 0, combo:GetTall() )
+            local x, y = combo:LocalToScreen(0, combo:GetTall())
             dm:SetMinimumWidth(combo:GetWide())
-            dm:Open( x, y, false, combo )
+            dm:Open(x, y, false, combo)
         end
 
         return root
     end,
-    list = function(id, key, data) -- this was even more painful
+    -- this was so painful
+    list = function(id, key, data)
         local val = menup.config.get(id, key, data[3])
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
 
-        if isstring(data[4]) then
-            root:SetTooltip(data[4])
-        end
-
         root:SetTall(48)
         combo:Dock(BOTTOM)
         combo:SetSortItems(false)
+
         function combo.DropButton.GetExpanded(s)
             return combo:IsMenuOpen()
         end
-        Derma_Hook(combo.DropButton, "Paint", "Paint", "ExpandButton")
 
+        Derma_Hook(combo.DropButton, "Paint", "Paint", "ExpandButton")
         label:Dock(FILL)
         label:SetText(data[1])
         label:SetTextColor(Color(0, 0, 0))
         combo:SetText(table.concat(val, ", "))
 
-        combo.DoClick = function()
-            if combo.Menu then combo.Menu:Remove() end
+        combo.DoClick = function(_, force)
+            if IsValid(combo.Menu) then
+                combo.Menu:Remove()
+                if not force then return end
+            end
+
             val = menup.config.get(id, key, data[3])
             local dm = DermaMenu(false, combo)
             combo.Menu = dm
@@ -532,32 +532,39 @@ local cfpnls = {
             add:SetTall(22)
             add:SetText("Add")
             add:SetIcon("icon16/add.png")
+
             add.DoClick = function()
                 local newval = table.Copy(val)
                 table.insert(newval, 1, "")
                 menup.config.set(id, key, newval)
                 hook.Run("UserConfigChange", id, key, newval, val)
-                local newdm = combo:DoClick()
+                local newdm = combo:DoClick(true)
                 newdm.first:RequestFocus()
             end
+
             ll:MakeDroppable("menup." .. id .. "." .. key)
             ll.children = {}
             dm:AddPanel(ll)
+
             for k, v in ipairs(val) do
                 local pan = ll:Add("DPanel")
                 local ep = pan:Add("EditablePanel")
                 local del = pan:Add("DButton")
                 local txt = ep:Add("DTextEntry")
+
                 if k == 1 then
                     dm.first = txt
                 end
+
                 pan.pos = k
                 pan.val = v
                 ll.children[k] = pan
                 pan.GetChecked = function() end
+
                 pan.Paint = function(_, w, h)
                     draw.RoundedBox(0, 1, 0, 22, h, color_gray)
                     draw.RoundedBox(0, 22, 0, w - 23, h, (pan.pos % 2 == 0) and color_gray or color_white)
+
                     if (pan:IsHovered() or pan:IsChildHovered() or txt:IsEditing()) and not dragndrop.IsDragging() then
                         pan:GetSkin().tex.Input.Slider.V.Hover(3, 3, 15, 16)
                         txt:SetPaintBackground(true)
@@ -571,26 +578,31 @@ local cfpnls = {
                         del:SetVisible(false)
                     end
                 end
+
                 del.DoClick = function()
                     pan:Remove()
                     ll:OnModified()
                 end
+
                 txt.OnGetFocus = function()
                     txt:MakePopup()
                     txt:SetDrawOnTop(true)
                     txt:SetPos(pan:LocalToScreen(22, 0))
                 end
+
                 txt.OnLoseFocus = function()
                     -- focus isnt automatically removed and the panel bugs out
                     -- this is the nuclear option :)
                     pan.val = txt:GetValue()
                     ll:OnModified(true)
                 end
+
                 txt.OnKeyCode = function(_, kc)
                     if kc == KEY_ENTER or kc == KEY_TAB then
                         txt:OnLoseFocus()
                     end
                 end
+
                 pan:Dock(TOP)
                 pan:SetTall(22)
                 del:SetPos(combo:GetWide() - 22, 0)
@@ -615,23 +627,29 @@ local cfpnls = {
                 timer.Simple(0, function()
                     if not IsValid(ll) then return end
                     local newval = {}
-                    for k,v in ipairs(ll.children) do
+
+                    for k, v in ipairs(ll.children) do
                         if not IsValid(v) then continue end
                         local pan = v
                         local pos = pan:GetY() / 22 + 1
                         pan.pos = pos
                         newval[pos] = pan.val
                     end
+
                     combo:SetText(table.concat(newval, ", "))
                     hook.Run("UserConfigChange", id, key, newval, val)
                     menup.config.set(id, key, newval)
-                    if refresh then combo:DoClick():MakePopup() end
+
+                    if refresh then
+                        combo:DoClick(true):MakePopup()
+                    end
                 end)
             end
 
-            local x, y = combo:LocalToScreen( 0, combo:GetTall() )
+            local x, y = combo:LocalToScreen(0, combo:GetTall())
             dm:SetMinimumWidth(combo:GetWide())
-            dm:Open( x, y, false, combo )
+            dm:Open(x, y, false, combo)
+
             return dm
         end
 
@@ -639,6 +657,7 @@ local cfpnls = {
     end,
 }
 
+-- this was even more painful
 function InfoPanel:Init()
     self:SetTall(512)
     self:SetPaintBackground(false)
@@ -696,6 +715,10 @@ function InfoPanel:BuildConfig(manifest)
             pnl:Dock(TOP)
             pnl:DockPadding(4, 4, 4, 4)
             pnl:DockMargin(0, 2, 0, 2)
+            if isstring(v[4]) then
+                pnl:SetTooltip(v[4])
+                -- pnl:SetTooltipDelay(0) -- https://github.com/Facepunch/garrysmod/pull/1875 please
+            end
         else
             print(manifest.id .. " has unknown config type \"" .. v[2] .. "\" for key \"" .. k .. "\"!")
         end
@@ -798,6 +821,7 @@ function PANEL:Init()
 
         function collapse.OnToggle(me, state)
             if not state then return end
+            -- info.target = 0
 
             for _, c in pairs(self:GetChildren()[1]:GetChildren()) do
                 if c ~= me then
