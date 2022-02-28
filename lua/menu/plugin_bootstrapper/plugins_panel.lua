@@ -63,8 +63,8 @@ local cfpnls = {
         label:SetText(data[1])
         label:SetTextColor(Color(0, 0, 0))
 
-        wang.OnValueChanged = function(pnl, val)
-            local newval = math.Round(val)
+        wang.OnValueChanged = function(pnl, newval)
+            newval = math.Round(newval)
 
             if val ~= newval then
                 wang:SetText(tostring(newval))
@@ -152,7 +152,7 @@ local cfpnls = {
         combo:Dock(BOTTOM)
         combo:SetSortItems(false)
 
-        for _, txt in ipairs(data[3]) do
+        for k, txt in ipairs(data[3]) do
             if txt == "" then
                 combo:AddSpacer()
             else
@@ -165,9 +165,14 @@ local cfpnls = {
         label:SetText(data[1])
         label:SetTextColor(Color(0, 0, 0))
 
+        combo.OnMenuOpened = function(pnl, dm)
+            dm:GetChild(val):SetChecked(true)
+        end
+
         combo.OnSelect = function(pnl, newval)
             hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
+            val = newval
         end
 
         return root
@@ -312,7 +317,7 @@ local cfpnls = {
             frame.PaintOver = function(s, w, h)
                 draw.RoundedBoxEx(16, 8, h, w - 16, 28, bgcol, false, false, true, true)
                 surface.SetFont("Trebuchet24")
-                local tw, th = surface.GetTextSize(message)
+                local tw = surface.GetTextSize(message)
                 surface.SetTextColor(color_white) -- where does this even come from lmao
                 surface.SetTextPos(w / 2 - tw / 2, h)
                 surface.DrawText(message)
@@ -717,7 +722,7 @@ function InfoPanel:BuildConfig(manifest)
             pnl:DockMargin(0, 2, 0, 2)
             if isstring(v[4]) then
                 pnl:SetTooltip(v[4])
-                -- pnl:SetTooltipDelay(0) -- https://github.com/Facepunch/garrysmod/pull/1875 please
+                pnl:SetTooltipDelay(0) -- https://github.com/Facepunch/garrysmod/pull/1875 please
             end
         else
             print(manifest.id .. " has unknown config type \"" .. v[2] .. "\" for key \"" .. k .. "\"!")

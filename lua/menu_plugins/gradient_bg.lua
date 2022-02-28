@@ -4,15 +4,16 @@ local CONFIG = {
         "Gradient speed", "range", {.1, 3, 1},
         "Speed at which colors change"
     },
-    btext = {"Background texts", "list", {}, "One is selected at random"},
+    btext = {"Background texts", "list", {}, "One is selected at random."},
     cschmoove = {
         "Schmoove speed", "range", {.5, 4, 1},
-        "Speed at which text waves"
+        "Speed at which text waves."
     },
-    dsize = {"Font size", "int", 0, "0 for automatic"},
-    eingame = {"Show text ingame", "bool", false},
+    dsize = {"Font size", "int", 0, "0 for automatic."},
+    eingame = {"Show text ingame", "bool", false, "Should text be visible on the pause menu during gameplay?"},
     fcolor = {
-        "In-game color", "color", {255, 255, 255, 160}
+        "In-game color", "color", {255, 255, 255, 160},
+        "Only works if the above option is enabled."
     },
 }
 
@@ -21,7 +22,7 @@ local MANIFEST = {
     author = "djsime1",
     name = "Background customizer",
     description = "Allows you to change how your menu background looks.",
-    version = "1.4",
+    version = "1.5",
     config = CONFIG
 }
 
@@ -38,11 +39,13 @@ local function reload()
     local size = menup.config.get(MANIFEST.id, "dsize", 0)
     local doingame = menup.config.get(MANIFEST.id, "eingame", false)
     local ingamecolor = menup.config.get(MANIFEST.id, "fcolor", Color(255, 255, 255, 160))
+
     if isstring(bgtxt) then
         menup.config.set(MANIFEST.id, "btext", {bgtxt})
     else
         bgtxt = table.Random(bgtxt) or ""
     end
+
     size = size > 0 and size or 96 * (ScrH() / 480)
 
     surface.CreateFont("GradientText", {

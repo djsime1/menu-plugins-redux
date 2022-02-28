@@ -1,7 +1,15 @@
 _G.menup = {}
-menup.version = "0.2.0" -- used to check for updates
+menup.version = "0.2.1" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
+- Implimented PR #1875 from the garrysmod repo. (Tooltip delays)  
+- Added helper text to all stock plugins.  
+- Added tick mark to currently selected config items.  
+- Added loading screen customizer.  
+- Fixed grammar in Background Customizer and Pling.  
+- Changed loading to gather all manifests before running the plugins for dependency checking.  
+
+*Previous changelog:*  
 - Added `api` and `dependencies` parameters to manifests.  
 - Added on join functionality to Pling.  
 - Added Color, Keybind, File, Stack, Sort, and List config types.  
@@ -12,13 +20,6 @@ menup.changelog = [[
 - Changed plugin loading to occur BEFORE menu is loaded.  
 - Removed debug print form `menup load` command.  
 - Removed menu_reload, menu_plugins, and menup_drawer commands.  
-*Previous changelog:*  
-- Updated the readme.  
-- Added `menup` console command. (Still needs autocomplete)  
-- Improved plugin loading output and fixed a potential error.  
-- The "save" parameter of `menup.control.enable/disable` now actually saves.  
-- Removed the useless calculator plugin.  
-- Update checker now shows notifications.  
 ]]
 
 local splash = [[
@@ -50,6 +51,7 @@ for i = 1, #splash do
 end
 
 MsgN()
+include("plugin_bootstrapper/tooltip_delay.lua")
 include("plugin_bootstrapper/md_panel.lua")
 include("plugin_bootstrapper/wip_panel.lua")
 include("plugin_bootstrapper/plugins_panel.lua")

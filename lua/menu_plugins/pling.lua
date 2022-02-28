@@ -1,12 +1,12 @@
 local CONFIG = {
-    sound = {"Sound path", "file", {"sound", "*", "garrysmod/content_downloaded.wav"}},
-    asound = {"Alert with sound", "bool", true},
-    aflash = {"Alert with taskbar flash", "bool", true},
+    sound = {"Sound path", "file", {"sound", "*", "garrysmod/content_downloaded.wav"}, "Sound to play when a pling is triggered."},
+    asound = {"Alert with sound", "bool", true, "Play a sound when a pling is triggered?"},
+    aflash = {"Alert with taskbar flash", "bool", true, "Flash the taskbar icon when a pling is triggered? (Windows only)"},
     onlaunch = {
-        "Notify on launch...", "select", {"When menu is loaded", "When workshop is complete", "Never"}
+        "Notify on launch...", "select", {"When menu is loaded", "When workshop is complete", "Never"}, "When you launch Garry's Mod."
     },
     onjoin = {
-        "Notify on join... ", "select", {"When spawned in server", "When lua started", "When FPS stabilizes", "Never"}
+        "Notify on join... ", "select", {"When spawned in server", "When lua started", "When FPS stabilizes", "Never"}, "When you join a server."
     },
 }
 
@@ -15,7 +15,7 @@ local MANIFEST = {
     author = "djsime1",
     name = "Pling!",
     description = "Allows you to be notified when GMod finishes loading, or when you fully load into a server.",
-    version = "1.2",
+    version = "1.3",
     config = CONFIG
 }
 

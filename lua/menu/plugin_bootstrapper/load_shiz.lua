@@ -187,19 +187,21 @@ local files, _ = file.Find("lua/menu_plugins/*.lua", "GAME")
 local start = SysTime()
 MsgC(Color(166, 166, 166), "+ ", Color(41, 121, 255), "[MPR]", Color(255, 255, 255), " Now loading plugins...\n")
 
-for _, v in ipairs(files) do
+for _, v in ipairs(files) do -- load manifests
     local manifest = menup.control.load("lua/menu_plugins/" .. v)
     if not istable(manifest) then continue end
     manifest.file = v
     menup.plugins[manifest.id] = manifest
+end
 
-    if shouldload[manifest.id] then
-        MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", manifest.id, v), Color(0, 230, 118), "enabled.\n")
-        menup.control.enable(manifest.id, false)
+for k, v in pairs(menup.plugins) do -- load plugins
+    if shouldload[k] == true then
+        MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", k, v.file), Color(0, 230, 118), "enabled.\n")
+        menup.control.enable(k, false)
     else
-        MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", manifest.id, v), Color(255, 23, 68), "disabled.\n")
-        manifest.enabled = false
-        shouldload[manifest.id] = false
+        MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", k, v.file), Color(255, 23, 68), "disabled.\n")
+        v.enabled = false
+        shouldload[k] = false
     end
 end
 
