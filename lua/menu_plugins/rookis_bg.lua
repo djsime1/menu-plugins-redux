@@ -10,7 +10,7 @@ local MANIFEST = {
     description = "You can change the background to a url!",
     version = "0.1",
     config = CONFIG,
-    source = "https://raw.githubusercontent.com/Pdzly/gmod_reduxed_background_plugin/main/rookis_bg.lua",
+    source = "https://raw.githubusercontent.com/Pdzly/rookis_gmod_reduxed_plugins/main/rookis_bg.lua",
     changelog = "Initial Release *It can have bugs!*.",
 }
 
