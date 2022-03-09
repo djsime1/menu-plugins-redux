@@ -28,6 +28,10 @@ local function pprint(txt)
     print("[TODO] " .. txt)
 end
 
+local function prettypaint(self, w, h, color)
+    draw.RoundedBox(5, 0, 0, w, h, color or Color(70, 70, 70, 204))
+end
+
 function todo.loadconfig()
     pprint("Loading Config")
     if (not file.Exists("rooki_todo/save.txt", "data")) then return end
@@ -89,6 +93,11 @@ function todo.addline()
     frame:ShowCloseButton(true)
     frame:SetTitle("New Entry")
     frame:MakePopup()
+
+    frame.Paint = function(self, w, h)
+        prettypaint(self, w, h)
+    end
+
     local text = vgui.Create("DTextEntry", frame)
     text:Dock(FILL)
     text:DockMargin(5, 5, 5, 5)
@@ -189,8 +198,8 @@ local function load_todo()
     todo.panel.frame:NoClipping(true)
     todo.panel.frame:SetSizable(true)
 
-    todo.panel.frame.Paint = function(self, wp, hp)
-        draw.RoundedBox(5, 0, 0, wp, hp, Color(70, 70, 70, 204))
+    todo.panel.frame.Paint = function(self, w, h)
+        prettypaint(self, w, h)
     end
 
     todo.panel.frame:ShowCloseButton(false)
@@ -253,12 +262,10 @@ end)
 if IsValid(pnlMainMenu) then
     todo.loadconfig()
     load_todo()
-    PrintTable(todo.config)
 else
     hook.Add("MenuVGUIReady", MANIFEST.id, function()
         todo.loadconfig()
         load_todo()
-        PrintTable(todo.config)
     end)
 end
 
