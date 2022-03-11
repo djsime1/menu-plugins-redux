@@ -180,30 +180,78 @@ function menup.control.disable(id, save)
 end
 
 if not file.IsDir("lua/menu_plugins", "GAME") then
-    error("Missing menu_plugins folder in garrysmod/lua!!")
+    Derma_Message("You are missing the menu_plugins folder in your garrysmod lua directory! Please create the folder, then restart the game.", "Menu Plugins Redux", "OK")
+
+    return error("Missing menu_plugins folder in garrysmod/lua!!")
 end
 
-local files, _ = file.Find("lua/menu_plugins/*.lua", "GAME")
+local files = file.Find("lua/menu_plugins/*.lua", "GAME")
+local status = util.JSONToTable(menup.db.get("loadstatus", [[{"loading": "done", "blame": ""}]]))
 local start = SysTime()
-MsgC(Color(166, 166, 166), "+ ", Color(41, 121, 255), "[MPR]", Color(255, 255, 255), " Now loading plugins...\n")
 
-for _, v in ipairs(files) do -- load manifests
-    local manifest = menup.control.load("lua/menu_plugins/" .. v)
-    if not istable(manifest) then continue end
-    manifest.file = v
-    menup.plugins[manifest.id] = manifest
-end
+-- Experimental crash prevention, comment out to enable.
+status = {loading = "done"}
 
-for k, v in pairs(menup.plugins) do -- load plugins
-    if shouldload[k] == true then
-        MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", k, v.file), Color(0, 230, 118), "enabled.\n")
-        menup.control.enable(k, false)
-    else
-        MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", k, v.file), Color(255, 23, 68), "disabled.\n")
-        v.enabled = false
-        shouldload[k] = false
+local function LoadManifests()
+    for _, v in ipairs(files) do
+        if v == status.blame then continue end
+
+        menup.db.set("loadstatus", util.TableToJSON({
+            loading = "manifest",
+            blame = v
+        }, false))
+
+        local manifest = menup.control.load("lua/menu_plugins/" .. v)
+        if not istable(manifest) then continue end
+        manifest.file = v
+        menup.plugins[manifest.id] = manifest
     end
 end
 
-menup.db.set("enabled", util.TableToJSON(shouldload, false))
-MsgC(Color(166, 166, 166), "+ ", Color(255, 255, 255), "Done! Plugins loaded in ", Color(41, 121, 255), tostring(math.Round((SysTime() - start) * 1000, 2)), Color(255, 255, 255), " milliseconds.\n")
+local function LoadPlugins()
+    for k, v in pairs(menup.plugins) do
+        if v.file == status.blame then continue end
+        menup.db.set("loadstatus", util.TableToJSON({
+            loading = "plugin",
+            blame = v.file
+        }, false))
+        if shouldload[k] == true then
+            MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", k, v.file), Color(0, 230, 118), "enabled.\n")
+            local lstart = SysTime()
+            menup.control.enable(k, false)
+            v.initalization = math.Round((SysTime() - start) * 1000, 2)
+        else
+            MsgC(Color(166, 166, 166), "| ", Color(255, 255, 255), string.format("%s (%s) is ", k, v.file), Color(255, 23, 68), "disabled.\n")
+            v.enabled = false
+            shouldload[k] = false
+        end
+    end
+end
+
+local function LoadFull()
+    MsgC(Color(166, 166, 166), "+ ", Color(41, 121, 255), "[MPR]", Color(255, 255, 255), " Now loading plugins...\n")
+    start = SysTime()
+    LoadManifests()
+    LoadPlugins()
+    menup.db.set("loadstatus", util.TableToJSON({
+        loading = "done",
+        blame = ""
+    }, false))
+    menup.db.set("enabled", util.TableToJSON(shouldload, false))
+    MsgC(Color(166, 166, 166), "+ ", Color(255, 255, 255), "Done! Plugins loaded in ", Color(41, 121, 255), tostring(math.Round((SysTime() - start) * 1000, 2)), Color(255, 255, 255), " milliseconds.\n")
+end
+
+if status.loading ~= "done" then
+    Derma_Query(string.format("Last time plugins were loaded, the game crashed. The crash was likely caused by the following plugin: %s. What would you like to do?", status.blame), "Menu Plugins Redux",
+    "Continue as normal", function()
+        status.blame = ""
+        LoadFull()
+    end, "Disable " .. status.blame, function()
+        shouldload[status.blame] = false
+        LoadFull()
+    end, "Don't load anything", function()
+    end)
+    return
+else
+    LoadFull()
+end

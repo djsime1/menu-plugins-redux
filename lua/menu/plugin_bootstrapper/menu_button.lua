@@ -30,6 +30,20 @@ function menup.drawer.open(x, y)
     end
 end
 
+menup.RGUIC = RunGameUICommand
+
+function RunGameUICommand(...)
+    local args = {...}
+    if string.lower(args[1]) == "quit" then
+        hook.Run("ShutDown")
+        timer.Simple(0, function()
+            menup.RGUIC("quit")
+        end)
+        return
+    end
+    menup.RGUIC(...)
+end
+
 hook.Add("DrawOverlay", "menup_button", function()
     hook.Remove("DrawOverlay", "menup_button")
     pcall(hook.Run, "MenuVGUIReady")
@@ -41,7 +55,7 @@ hook.Add("DrawOverlay", "menup_button", function()
         var container = document.createElement("span");
         container.setAttribute("id", "PluginsButton")
         navright.appendChild(container);
-        container.innerHTML = `<li class="smallicon hidelabel" onclick="lua.Run('if table.Count(menup.drawer.buttons) == 0 then ShowPluginsWindow() else menup.drawer.open() end')"><img src='asset://garrysmod/materials/icon16/plugin.png'><span>Plugins</span></li>`
+        container.innerHTML = "<li class=\"smallicon hidelabel\" onclick=\"lua.Run('DoMenuButton()')\"><img src='asset://garrysmod/materials/icon16/plugin.png'><span>Plugins</span></li>"
         ]])
     else
         print("Custom menu detected, open plugins window by running menu_plugins.")

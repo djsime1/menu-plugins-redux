@@ -2,24 +2,22 @@ _G.menup = {}
 menup.version = "0.2.1" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
+- Added menu button on 32-bit GMod (If this crashes, [open an issue!](https://github.com/djsime1/menu-plugins-redux/issues))  
+- Added current changelogs in about page.  
+- Added initalization timer to plugins that auto-load.  
+- Added `ShutDown` hook for when the player quits the game.  
+- Changed error message when `menu_plugins` folder doesn't exist.  
+- Updated "Find more" tab with new public repo link.  
+- Fixed Background Customizer in-game text.  
+- Reduced the chance of menu button crashing on 64-bit GMod.  
+
+*Previous changelog:*  
 - Implimented PR #1875 from the garrysmod repo. (Tooltip delays)  
 - Added helper text to all stock plugins.  
 - Added tick mark to currently selected config items.  
 - Added loading screen customizer.  
 - Fixed grammar in Background Customizer and Pling.  
 - Changed loading to gather all manifests before running the plugins for dependency checking.  
-
-*Previous changelog:*  
-- Added `api` and `dependencies` parameters to manifests.  
-- Added on join functionality to Pling.  
-- Added Color, Keybind, File, Stack, Sort, and List config types.  
-- Added in-game color option to Background Customizer.  
-- Fixed an potential issue with the toolbar button.  
-- Changed Pling sound option to file type.  
-- Changed Background Customizer to allow multiple background texts.  
-- Changed plugin loading to occur BEFORE menu is loaded.  
-- Removed debug print form `menup load` command.  
-- Removed menu_reload, menu_plugins, and menup_drawer commands.  
 ]]
 
 local splash = [[
@@ -53,7 +51,6 @@ end
 MsgN()
 include("plugin_bootstrapper/tooltip_delay.lua")
 include("plugin_bootstrapper/md_panel.lua")
-include("plugin_bootstrapper/wip_panel.lua")
 include("plugin_bootstrapper/plugins_panel.lua")
 include("plugin_bootstrapper/plugins_window.lua")
 include("plugin_bootstrapper/menu_button.lua")

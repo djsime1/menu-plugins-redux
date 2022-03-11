@@ -70,6 +70,8 @@ local function menup_restart(confirm)
             PluginsWindow:Close()
         end
 
+        RunGameUICommand = menup.RGUIC
+
         table.Empty(menup)
 
         if pnlMainMenu and pnlMainMenu.HTML and vgui.GetControlTable("MainMenuPanel") then

@@ -22,7 +22,7 @@ local MANIFEST = {
     author = "djsime1",
     name = "Background customizer",
     description = "Allows you to change how your menu background looks.",
-    version = "1.5",
+    version = "1.6",
     config = CONFIG
 }
 
@@ -67,7 +67,7 @@ local function reload()
             surface.DrawRect(-1, -1, w + 2, h + 2)
             fade = 1
         else
-            surface.SetTextColor(ingamecolor:Unpack())
+            surface.SetTextColor(ingamecolor.r, ingamecolor.g, ingamecolor.b, ingamecolor.a)
             fade = 0
         end
 

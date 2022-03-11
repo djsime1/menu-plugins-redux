@@ -1,5 +1,6 @@
 local InfoPanel = table.Copy(vgui.GetControlTable("DPanel"))
 local color_gray = Color(222, 222, 222)
+local html_queue = {}
 
 local function LegacyConfig(v)
     local dm = DermaMenu()
@@ -672,10 +673,11 @@ function InfoPanel:Init()
     controls:SetTall(36)
     local toggle = controls:Add("DButton")
     local alt = controls:Add("DButton")
-    local md = self:Add("MarkdownPanel")
+    local md = self:Add("DPanel")
     local cp = self:Add("DScrollPanel")
     md:SetPos(0, 32)
     md:SetTall(512)
+    md:SetPaintBackground(false)
     cp:SetPos(self:GetWide(), 32)
     cp:SetTall(512)
     self.controls = controls
@@ -758,7 +760,12 @@ function InfoPanel:Load(manifest)
         info = info .. string.format("*Source* : [%s](%s)  \n", manifest.source:match("^https?://([^/]+)"), manifest.source)
     end
 
-    self.md:SetMarkdown(info)
+    if manifest.initalization then
+        info = info .. string.format("*Initalization* : %s ms  \n", tostring(manifest.initalization))
+    end
+
+    -- self.md:SetMarkdown(info)
+    table.insert(html_queue, {self.md, info}) -- hopefully this fixes the crashing issue
 
     if manifest.enabled then
         self.toggle:SetText("Disable")
@@ -909,5 +916,14 @@ end
 
 function PANEL:Paint()
 end
+
+hook.Add("DrawOverlay", "MPR_HTML", function()
+    if #html_queue > 0 then
+        local data = table.remove(html_queue, 1)
+        local md = data[1]:Add("MarkdownPanel")
+        md:SetMarkdown(data[2])
+        md:Dock(FILL)
+    end
+end)
 
 vgui.Register("PluginsPanel", PANEL, "DCategoryList")
