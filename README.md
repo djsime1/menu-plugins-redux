@@ -1,6 +1,6 @@
 
 <a href="#">
-  <img align="center" src="https://user-images.githubusercontent.com/8518150/147179067-261dc00f-c841-464a-9fc3-4d82472cd395.png" title="Menu Plugins Redux">
+  <img align="center" src="https://user-images.githubusercontent.com/8518150/147179067-261dc00f-c841-464a-9fc3-4d82472cd395.png" title="Menu Plugins Redux" alt="Menu Plugins Redux">
 </a>
 <hr>
 <h3 align="center">
@@ -14,7 +14,7 @@
   <li>🧩 Some sample plugins to get you started.</li>
   <li>✅ Fully compatible with legacy menu plugins!</li>
   <li>🤖 Automatic update checking & notification.</li>
-  <li>🔎 Search & install plugins without leaving the game. 🔸</li>
+  <li>🔎 <a href="https://github.com/djsime1/redux-plugins/tree/main">Search & install plugins</a> without leaving the game. 🔸</li>
   <i>(🔸 Not yet implemented/work in progress!)</i>
 </ul>
 <hr>
@@ -63,6 +63,12 @@
   Assuming you're on the x86-64 branch, there should be a new button on the default menu toolbar named "Plugins."<br>
   There should also be a fancy banner in your console. Running the command <code>menup gui</code> will open a GUI.<br>
   More commands can be found by running the <code>menup</code> command.
+</details>
+<details>
+  <summary>🎆 Find more plugins.</summary>
+  While MPR ships with a few plugins of its own, you can install any compatible plugin.<br>
+  <a href="https://github.com/djsime1/redux-plugins/tree/main">Check out this page</a> to find some more public plugins!<br>
+  To install them, drag and drop the plugin's Lua file into the <code>menu_plugins</code> folder in your <code>garrysmod/lua</code> directoy.
 </details>
 <hr>
 <h2>👨‍💻 Development & Contributing</h2>
