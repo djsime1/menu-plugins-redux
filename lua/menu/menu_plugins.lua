@@ -1,14 +1,19 @@
 _G.menup = {}
-menup.version = "0.2.1" -- used to check for updates
+menup.version = "0.2.2" -- used to check for updates
 menup.source = "https://raw.githubusercontent.com/djsime1/menu-plugins-redux/main/lua/menu/menu_plugins.lua" -- link to a file with the version string above
 menup.changelog = [[
 - Added menu button on 32-bit GMod (If this crashes, [open an issue!](https://github.com/djsime1/menu-plugins-redux/issues))  
 - Added current changelogs in about page.  
 - Added initalization timer to plugins that auto-load.  
 - Added `ShutDown` hook for when the player quits the game.  
+- Added Custom Server Blacklist plugin.  
+- Added Loading Screen Modifier plugin.  
 - Changed error message when `menu_plugins` folder doesn't exist.  
+- Changed config menu to fix an annoyance.  
 - Updated "Find more" tab with new public repo link.  
+- Updated the Update Checker to be slower (for a good reason).  
 - Fixed Background Customizer in-game text.  
+- Fixed Update Checker to handle HTTP errors.  
 - Reduced the chance of menu button crashing on 64-bit GMod.  
 
 *Previous changelog:*  

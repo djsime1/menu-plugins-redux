@@ -1,9 +1,9 @@
 local CONFIG = {
     channel = {
-        "Update channel", "select", {"Stable", "Beta"},
+        "MPR Update channel", "select", {"Stable", "Beta"},
         "Beta has more frequent updates, but may contain bugs."
     },
-    plugins = {"Check for plugin updates", "bool", true, "Not all plugins are supported."}
+    plugins = {"Check for plugin updates", "bool", true, "Only works on plugins with sources."}
 }
 
 local MANIFEST = {
@@ -11,7 +11,7 @@ local MANIFEST = {
     author = "djsime1",
     name = "Update checker",
     description = "Notifies when a new version of MPR and/or plugins are available.",
-    version = "1.3",
+    version = "1.5",
     config = CONFIG,
 }
 
@@ -32,7 +32,13 @@ local function vnum(version)
 end
 
 local function mprcheck(url, cb)
-    http.Fetch(url, function(body)
+    http.Fetch(url, function(body, _, _, code)
+        if code ~= 200 then
+            print("MPR update check failed. (HTTP Code " .. code .. ")")
+            cb(false)
+            return
+        end
+
         local ver, changelog = body:match("menup%.version = \"(%d+%.%d+%.%d+)\""), body:match("menup%.changelog = %[%[\n?(.-)\n?]]") or "No changelog."
 
         if not ver then
@@ -59,12 +65,21 @@ end
 local function pcheck(id, cb)
     local plugin = menup.plugins[id]
 
-    http.Fetch(plugin.source, function(body)
+    http.Fetch(plugin.source, function(body, _, _, code)
+
+        if code ~= 200 then
+            print(id .. " update check failed. (HTTP Code " .. code .. ")")
+            cb(false)
+
+            return
+        end
+
         local func = CompileString(body, "Update check", false)
 
         if isstring(func) then
             print(id .. " update check failed. (" .. func .. ")")
             cb(false)
+            return
         end
 
         local manifest = menup.control.preload(func)
@@ -117,8 +132,6 @@ local function popup(updates)
             ["1 day"] = 86400,
             ["3 days"] = 172800,
             ["A week"] = 604800,
-            ["A month"] = 2678400,
-            ["9001 years"] = 31536000 * 9001
         }
 
         local dm = DermaMenu()
@@ -143,13 +156,12 @@ local function popup(updates)
     frame:MakePopup()
 end
 
-hook.Add("MenuVGUIReady", MANIFEST.id, function()
-    if menup.config.get(MANIFEST.id, "silence", 0) > os.time() then return end
-
+local function check()
     local branch = ({"main", "dev"})[menup.config.get(MANIFEST.id, "channel", 1)]
 
     local url = string.format("https://raw.githubusercontent.com/djsime1/menu-plugins-redux/%s/lua/menu/menu_plugins.lua", branch)
-    local count, expecting = 0, 1
+    local expecting = 1
+    local queue = {}
     local updates = {} -- {name, current, new, source, changelog}
     RealFrameTime = FrameTime -- RFT doesn't exist in menu realm and is needed for notifications
     notification.AddProgress(MANIFEST.id, "Checking for updates...", 0)
@@ -159,10 +171,9 @@ hook.Add("MenuVGUIReady", MANIFEST.id, function()
             table.insert(updates, data)
         end
 
-        count = count + 1
-        notification.AddProgress(MANIFEST.id, "Checking for updates...", count / expecting)
+        notification.AddProgress(MANIFEST.id, "Checking for updates...", 1 - (#queue / expecting))
 
-        if count >= expecting then
+        if #queue == 0 then
             notification.Kill(MANIFEST.id)
 
             if #updates ~= 0 then
@@ -171,16 +182,38 @@ hook.Add("MenuVGUIReady", MANIFEST.id, function()
             else
                 notification.AddLegacy("You are all up to date.", NOTIFY_GENERIC, 5)
             end
+        else
+            pcheck(table.remove(queue), cb)
+        end
+    end
+
+    if menup.config.get(MANIFEST.id, "plugins", true) then
+        for k, v in pairs(menup.plugins) do
+            if not v.legacy and v.source and v.version then
+                table.insert(queue, k)
+                expecting = expecting + 1
+            end
         end
     end
 
     mprcheck(url, cb)
-    if not menup.config.get(MANIFEST.id, "plugins", true) then return end
+end
 
-    for k, v in pairs(menup.plugins) do
-        if not v.legacy and v.source and v.version then
-            pcheck(k, cb)
-            expecting = expecting + 1
-        end
+local didrun = false
+
+hook.Add("MenuVGUIReady", MANIFEST.id, function()
+    if menup.config.get(MANIFEST.id, "silence", 0) < os.time() then
+        check()
+        didrun = true
+    end
+end)
+
+if IsValid(pnlMainMenu) and not didrun and menup.config.get(MANIFEST.id, "silence", 0) < os.time() then
+    check()
+end
+
+hook.Add("ConfigApply", MANIFEST.id, function(id)
+    if id == MANIFEST.id then
+        check()
     end
 end)

@@ -201,10 +201,10 @@ local function LoadManifests()
             blame = v
         }, false))
 
-        local manifest = menup.control.load("lua/menu_plugins/" .. v)
-        if not istable(manifest) then continue end
-        manifest.file = v
-        menup.plugins[manifest.id] = manifest
+        local res, ret = pcall(menup.control.load, "lua/menu_plugins/" .. v)
+        if not res then continue end
+        ret.file = v
+        menup.plugins[ret.id] = ret
     end
 end
 

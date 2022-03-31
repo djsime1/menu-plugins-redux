@@ -33,7 +33,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local cb = root:Add("DCheckBox")
-
         cb:Dock(RIGHT)
         cb:SetWide(15)
         cb:SetChecked(val)
@@ -44,6 +43,7 @@ local cfpnls = {
         cb.OnChange = function(pnl, newval)
             hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
+            val = newval
         end
 
         return root
@@ -53,7 +53,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local wang = root:Add("DNumberWang")
-
         wang:Dock(RIGHT)
         wang:SetWide(96)
         wang:SetDecimals(0)
@@ -65,14 +64,13 @@ local cfpnls = {
         label:SetTextColor(Color(0, 0, 0))
 
         wang.OnValueChanged = function(pnl, newval)
-            newval = math.Round(newval)
-
-            if val ~= newval then
-                wang:SetText(tostring(newval))
+            if string.match(newval, "%D") then
+                wang:SetText(tostring(val))
+            else
+                hook.Run("UserConfigChange", id, key, newval, val)
+                menup.config.set(id, key, newval)
+                val = newval
             end
-
-            hook.Run("UserConfigChange", id, key, newval, val)
-            menup.config.set(id, key, newval)
         end
 
         return root
@@ -82,7 +80,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local wang = root:Add("DNumberWang")
-
         wang:Dock(RIGHT)
         wang:SetWide(96)
         wang:SetMin(-math.huge)
@@ -95,18 +92,18 @@ local cfpnls = {
         wang.OnValueChanged = function(pnl, newval)
             hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
+            val = newval
         end
 
         return root
     end,
     range = function(id, key, data)
         local min, max, default = data[3][1], data[3][2], data[3][3]
-        min = (min ~= nil and min or 0)
-        max = (max ~= nil and max or 100)
+        min = min ~= nil and min or 0
+        max = max ~= nil and max or 100
         local val = menup.config.get(id, key, isnumber(default) and default or 0)
         local root = vgui.Create("DPanel")
         local slider = root:Add("DNumSlider")
-
         slider:Dock(FILL)
         slider:SetDecimals(3)
         slider:SetMinMax(min, max)
@@ -117,6 +114,7 @@ local cfpnls = {
         slider.OnValueChanged = function(pnl, newval)
             hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
+            val = newval
         end
 
         return root
@@ -126,7 +124,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local tbox = root:Add("DTextEntry")
-
         root:SetTall(48)
         tbox:Dock(BOTTOM)
         tbox:SetText(val)
@@ -139,6 +136,7 @@ local cfpnls = {
             local newval = pnl:GetText()
             hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
+            val = newval
         end
 
         return root
@@ -148,7 +146,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
-
         root:SetTall(48)
         combo:Dock(BOTTOM)
         combo:SetSortItems(false)
@@ -183,7 +180,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local preview = root:Add("DColorButton")
-
         preview:Dock(RIGHT)
         preview:SetWide(48)
         preview:SetColor(val, true)
@@ -236,6 +232,7 @@ local cfpnls = {
                 preview:SetColor(newval, true)
                 hook.Run("UserConfigChange", id, key, newval, val)
                 menup.config.set(id, key, newval)
+                val = newval
                 picker:Remove()
             end
 
@@ -263,7 +260,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local binder = root:Add("DBinder")
-
         binder:Dock(RIGHT)
         binder:SetWide(96)
         binder:SetValue(val)
@@ -274,6 +270,7 @@ local cfpnls = {
         binder.OnChange = function(pnl, newval)
             hook.Run("UserConfigChange", id, key, newval, val)
             menup.config.set(id, key, newval)
+            val = newval
         end
 
         return root
@@ -291,7 +288,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local preview = root:Add("DButton")
-
         root:SetTall(48)
         preview:Dock(BOTTOM)
         preview:SetText(isstring(val) and val or "No file selected")
@@ -337,6 +333,7 @@ local cfpnls = {
                 preview:SetText(newval)
                 hook.Run("UserConfigChange", id, key, newval, val)
                 menup.config.set(id, key, newval)
+                val = newval
                 frame:Close()
             end
 
@@ -350,7 +347,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
-
         root:SetTall(48)
         combo:Dock(BOTTOM)
         combo:SetSortItems(false)
@@ -412,7 +408,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
-
         root:SetTall(48)
         combo:Dock(BOTTOM)
         combo:SetSortItems(false)
@@ -488,6 +483,7 @@ local cfpnls = {
                     combo:SetText(table.concat(newval, ", "))
                     hook.Run("UserConfigChange", id, key, newval, val)
                     menup.config.set(id, key, newval)
+                    val = newval
 
                     if refresh then
                         combo:DoClick(true):MakePopup()
@@ -508,7 +504,6 @@ local cfpnls = {
         local root = vgui.Create("DPanel")
         local label = root:Add("DLabel")
         local combo = root:Add("DComboBox")
-
         root:SetTall(48)
         combo:Dock(BOTTOM)
         combo:SetSortItems(false)
@@ -645,6 +640,7 @@ local cfpnls = {
                     combo:SetText(table.concat(newval, ", "))
                     hook.Run("UserConfigChange", id, key, newval, val)
                     menup.config.set(id, key, newval)
+                    val = newval
 
                     if refresh then
                         combo:DoClick(true):MakePopup()
@@ -722,6 +718,7 @@ function InfoPanel:BuildConfig(manifest)
             pnl:Dock(TOP)
             pnl:DockPadding(4, 4, 4, 4)
             pnl:DockMargin(0, 2, 0, 2)
+
             if isstring(v[4]) then
                 pnl:SetTooltip(v[4])
                 pnl:SetTooltipDelay(0) -- https://github.com/Facepunch/garrysmod/pull/1875 please
@@ -764,8 +761,10 @@ function InfoPanel:Load(manifest)
         info = info .. string.format("*Initalization* : %s ms  \n", tostring(manifest.initalization))
     end
 
-    -- self.md:SetMarkdown(info)
-    table.insert(html_queue, {self.md, info}) -- hopefully this fixes the crashing issue
+    if self.md:ChildCount() == 0 then
+        -- hopefully this fixes the crashing issue
+        table.insert(html_queue, {self.md, info})
+    end
 
     if manifest.enabled then
         self.toggle:SetText("Disable")
@@ -833,8 +832,8 @@ function PANEL:Init()
 
         function collapse.OnToggle(me, state)
             if not state then return end
-            -- info.target = 0
 
+            -- info.target = 0
             for _, c in pairs(self:GetChildren()[1]:GetChildren()) do
                 if c ~= me then
                     c:DoExpansion(false)

@@ -30,7 +30,7 @@ function PANEL:Init()
     fm:Dock(FILL)
     fm:SetMarkdown([[# Sorta W.I.P.
 Eventually this screen will automagically list all avilable plugins from the public repository.
-Unfortunately that hasn't been set up yet.
+However, that hasn't been set up yet.
 Click the button at the bottom of this window to open the repository URL and browse the plugins.
 ]])
     find:SetPaintBackground(false)

@@ -8,6 +8,8 @@
 !/lua/menu_plugins/pling.lua
 !/lua/menu_plugins/mpr_update_check.lua
 !/lua/menu_plugins/menu_dev.lua
+!/lua/menu_plugins/loading_customizer.lua
+!/lua/menu_plugins/manual_blacklist.lua
 !/lua/menu
 !/lua/menu/menu.lua
 !/lua/menu/menu_plugins.lua
