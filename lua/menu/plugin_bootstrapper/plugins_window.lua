@@ -1,8 +1,7 @@
 local PANEL = {}
 
 function PANEL:Init()
-    self:SetSize(400, 600)
-    --self:SetSize(ScrW() * 0.4, ScrH() * 0.6)
+    self:SetSize(ScrW()/4.8,ScrH()/1.8)
     self:Center()
     self:SetMinimumSize(400, 600)
     self:DockPadding(5, 3, 5, 3)
@@ -65,6 +64,7 @@ In addition, the following licenses apply to libraries/code used within MPR:
 - [Modest CSS](https://github.com/markdowncss/modest) : [MIT license](https://github.com/markdowncss/modest/blob/master/LICENSE).  
 - [vON](https://github.com/vercas/vON) :[Read here](https://github.com/vercas/vON/blob/master/von.lua#L1:L23).  
 ]]):format(menup.version, menup.changelog))
+    self:SetMinimumSize(tabs:GetWide()+270)
     self.about = about
     self.btnClose:MoveToFront()
     self.btnMaxim:Hide()
