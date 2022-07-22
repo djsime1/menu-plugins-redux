@@ -3,7 +3,6 @@ local PANEL = {}
 function PANEL:Init()
     self:SetSize(ScrW()/4.8,ScrH()/1.8)
     self:Center()
-    self:SetMinimumSize(400, 600)
     self:DockPadding(5, 3, 5, 3)
     self:SetTitle("")
     self:SetDraggable(true)
